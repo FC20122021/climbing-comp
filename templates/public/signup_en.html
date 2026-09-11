@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ale 2.0 Women's Bouldering Warm-up Competition · Registration</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px;
+        }
+        .page-wrapper { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
+        .container {
+            background: #ffffff; border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.1); padding: 32px 28px;
+        }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 26px; color: #1a418f; margin-bottom: 6px; }
+        .header p { color: #1a418f; opacity: 0.7; font-size: 15px; }
+        .event-info {
+            text-align: center; color: #1a418f; font-size: 15px;
+            background: #e8f7ef; border: 1.5px solid #0dac67;
+            border-radius: 12px; padding: 14px; margin-bottom: 20px; font-weight: 600;
+            line-height: 1.9;
+        }
+        .section-title {
+            font-size: 17px; color: #1a418f; font-weight: 700;
+            margin: 26px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #0dac67;
+        }
+        .section-title:first-of-type { margin-top: 0; }
+        .section-note {
+            background: #f3dfae; border-left: 4px solid #0dac67; border-radius: 8px;
+            padding: 12px 16px; margin-bottom: 8px; font-size: 14px; color: #1a418f; line-height: 1.7;
+        }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 15px; color: #1a418f; margin-bottom: 8px; font-weight: 600; }
+        .phone-row { display: flex; gap: 8px; }
+        .phone-row select {
+            width: 110px; padding: 12px 10px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; font-size: 16px; background: #fff; color: #1a418f;
+            appearance: none; -webkit-appearance: none;
+        }
+        .phone-row input {
+            flex: 1; padding: 12px 14px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; font-size: 16px; background: #fff; color: #1a418f;
+        }
+        input:focus, select:focus { outline: none; border-color: #0dac67; box-shadow: 0 0 0 3px rgba(13,172,103,0.15); }
+        .full-input, .level-select {
+            width: 100%; padding: 12px 14px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; font-size: 16px; background: #fff; color: #1a418f;
+        }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 4px 0; }
+        .checkbox-group label {
+            display: flex; align-items: center; gap: 6px;
+            font-weight: 500; font-size: 15px; color: #1a418f; cursor: pointer; margin: 0;
+        }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #0dac67; }
+        .rules-box {
+            background: #e8f7ef; border: 1.5px solid #0dac67; border-radius: 12px;
+            padding: 20px; font-size: 14px; color: #1a418f; line-height: 1.8;
+            max-height: 420px; overflow-y: auto;
+        }
+        .rules-box h3 { font-size: 16px; color: #1a418f; margin-bottom: 10px; margin-top: 16px; font-weight: 700; }
+        .rules-box h3:first-child { margin-top: 0; }
+        .rules-box p { margin-top: 10px; margin-bottom: 4px; font-weight: 600; color: #1a418f; }
+        .rules-box ol { padding-left: 22px; margin-bottom: 6px; }
+        .rules-box ul { padding-left: 18px; margin-top: 4px; }
+        .rules-box li { margin-bottom: 5px; }
+        .agree-row {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin: 20px 0 18px; font-size: 15px; color: #1a418f;
+        }
+        .agree-row input[type="checkbox"] {
+            width: 20px; height: 20px; margin-top: 1px; cursor: pointer;
+            flex-shrink: 0; accent-color: #0dac67;
+        }
+        .agree-row label { margin: 0; font-weight: 500; cursor: pointer; }
+        .btn-submit {
+            width: 100%; padding: 18px; background: #0dac67; color: white;
+            border: none; border-radius: 12px; font-size: 19px; font-weight: 700;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-submit:hover { background: #0a8a53; }
+        .message {
+            padding: 14px 18px; border-radius: 10px; margin-bottom: 20px;
+            font-size: 15px; text-align: center; display: none;
+        }
+        .message.show { display: block; }
+        .message.error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+        .message.success { background: #e8f7ef; color: #0dac67; border: 1px solid #0dac67; }
+        .number-status { margin-top: 4px; font-size: 14px; font-weight: 600; }
+        .number-status.ok { color: #0dac67; }
+        .number-status.err { color: #e74c3c; }
+        @media (max-width: 768px) {
+            body { margin-left: 0; padding-top: 64px; }
+            .page-wrapper { padding: 20px; }
+            .container { padding: 26px 20px; border-radius: 20px; }
+            .header h1 { font-size: 20px; }
+            .rules-box { max-height: 300px; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    {% include '_public_nav.html' %}
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Ale 2.0 Women's Bouldering Warm-up Competition</h1>
+                <p>Fill in your info to join</p>
+            </div>
+            <div class="event-info">
+                📅 Date: September 19, 2026 · 7:00 PM – 9:00 PM (2 hours)<br>
+                📍 Venue: Allez Climbing Gym 1.0<br>
+                🗺️ Address: Room 401, Anime Building, No. 2008 Yijing Road, Huangbei Street, Luohu District, Shenzhen<br>
+                🎫 Free entry · Membership required · One punch deducted from punch cards<br>
+                ⚠️ Female members only
+            </div>
+            <div id="message" class="message {{ msg_type }} {% if message %}show{% endif %}">{{ message }}</div>
+
+            <form action="{{ url_for('signup_post') }}" method="POST" id="signup-form">
+                <div class="section-title">1. Personal Info</div>
+                <div class="form-group">
+                    <label for="name">Name / Nickname <span style="color:#e74c3c;">*</span></label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name or nickname" required class="full-input">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone <span style="color:#e74c3c;">*</span></label>
+                    <div class="phone-row">
+                        <select id="country_code" name="country_code">
+                            <option value="+86">+86</option>
+                            <option value="+852">+852</option>
+                        </select>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter phone number" required>
+                    </div>
+                    <small style="display:block; margin-top:6px; color:#1a418f; opacity:0.6;">Select country code and enter the correct number of digits.</small>
+                </div>
+                <div class="form-group">
+                    <label for="card_type">Membership Type <span style="color:#e74c3c;">*</span></label>
+                    <select id="card_type" name="card_type" class="level-select" required>
+                        <option value="">Select membership type</option>
+                        <option value="月卡">Monthly</option>
+                        <option value="季卡">Quarterly</option>
+                        <option value="年卡">Annual</option>
+                        <option value="次卡">Punch Card</option>
+                    </select>
+                    <small style="display:block; margin-top:6px; color:#e74c3c;">This competition is for members only. Please sign up for a membership first.</small>
+                </div>
+                <div class="form-group">
+                    <label for="number">Choose Your Competition Number (0–999, optional)</label>
+                    <input type="number" id="number" name="number" min="0" max="999" placeholder="Enter a number from 0 to 999" class="full-input">
+                    <div id="number_status" class="number-status"></div>
+                    <small style="display:block; margin-top:2px; color:#1a418f; opacity:0.65;">First come, first served. If taken, please choose another. Leave blank to be assigned by the organizer.</small>
+                </div>
+
+                <div class="section-note">
+                    📝 The following info helps us better understand our community and improve our programs and events. Thanks for sharing!
+                </div>
+                <div class="section-title" style="margin-top: 0;">2. Climbing Background</div>
+                <div class="form-group">
+                    <label for="level">Climbing Level</label>
+                    <select id="level" name="level" class="level-select">
+                        <option value="">Select</option>
+                        <option value="V0">V0</option><option value="V1">V1</option><option value="V2">V2</option>
+                        <option value="V3">V3</option><option value="V4">V4</option><option value="V5">V5</option>
+                        <option value="V6">V6</option><option value="V7">V7</option><option value="V8及以上">V8+</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="climbing_years">How long have you been climbing?</label>
+                    <select id="climbing_years" name="climbing_years" class="level-select">
+                        <option value="">Select</option>
+                        <option value="不到半年">Less than 6 months</option>
+                        <option value="半年到1年">6 months – 1 year</option>
+                        <option value="1-2年">1–2 years</option>
+                        <option value="2-3年">2–3 years</option>
+                        <option value="3-5年">3–5 years</option>
+                        <option value="5年以上">5+ years</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="climbing_frequency">Climbing Frequency</label>
+                    <select id="climbing_frequency" name="climbing_frequency" class="level-select">
+                        <option value="">Select</option>
+                        <option value="每周1次以下">Less than once a week</option>
+                        <option value="每周1-2次">1–2 times a week</option>
+                        <option value="每周3-4次">3–4 times a week</option>
+                        <option value="每周5次以上">5+ times a week</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Which days do you usually come? (multi-select)</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="climbing_days" value="周一"> Mon</label>
+                        <label><input type="checkbox" name="climbing_days" value="周二"> Tue</label>
+                        <label><input type="checkbox" name="climbing_days" value="周三"> Wed</label>
+                        <label><input type="checkbox" name="climbing_days" value="周四"> Thu</label>
+                        <label><input type="checkbox" name="climbing_days" value="周五"> Fri</label>
+                        <label><input type="checkbox" name="climbing_days" value="周六"> Sat</label>
+                        <label><input type="checkbox" name="climbing_days" value="周日"> Sun</label>
+                        <label><input type="checkbox" name="climbing_days" value="不固定"> Not fixed</label>
+                    </div>
+                </div>
+
+                <div class="section-title">3. How did you hear about us?</div>
+                <div class="form-group">
+                    <label for="discovery_channel">How did you find Allez Climbing Gym?</label>
+                    <select id="discovery_channel" name="discovery_channel" class="level-select">
+                        <option value="">Select</option>
+                        <option value="岩友推荐">Referred by a climber</option>
+                        <option value="朋友介绍">Referred by a friend</option>
+                        <option value="小红书">Xiaohongshu</option>
+                        <option value="抖音">Douyin</option>
+                        <option value="大众点评/美团">Dianping / Meituan</option>
+                        <option value="微信公众号">WeChat Official Account</option>
+                        <option value="路过看到">Walked by</option>
+                        <option value="其他">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="competition_channel">How did you hear about this competition?</label>
+                    <select id="competition_channel" name="competition_channel" class="level-select">
+                        <option value="">Select</option>
+                        <option value="岩馆公众号">Gym Official Account</option>
+                        <option value="微信群">WeChat Group</option>
+                        <option value="岩友告知">Told by a climber</option>
+                        <option value="小红书">Xiaohongshu</option>
+                        <option value="抖音">Douyin</option>
+                        <option value="现场海报">In-gym poster</option>
+                        <option value="其他">Other</option>
+                    </select>
+                </div>
+
+                <div class="section-title">4. Rules & Waiver</div>
+                <div class="rules-box">
+                    <h3>📋 Competition Rules</h3>
+
+                    <p>1. Format</p>
+                    <ol>
+                        <li>This is a bouldering competition with several routes; the exact number will be announced on site.</li>
+                        <li>Climbers must finish within the designated time; otherwise the score is invalid.</li>
+                        <li>Each route has a Zone and a Top:
+                            <ul>
+                                <li>Top: 25 points</li>
+                                <li>Zone only: 10 points</li>
+                                <li>No scoring point reached: 0 points</li>
+                            </ul>
+                        </li>
+                        <li>Each failed attempt deducts 0.1 point. Deductions only apply if the climber ultimately reaches a Top or Zone. If no scoring point is reached, no deduction is made.</li>
+                        <li>Ranking is by total score. Ties are broken by Top count, then Zone count, then fewer failed attempts. If still tied, ranks are shared.</li>
+                    </ol>
+
+                    <p>2. Fees & Entry</p>
+                    <ol>
+                        <li>There is <strong>no competition fee</strong>.</li>
+                        <li>Participants must be members of Allez Climbing Gym and check in normally to join.</li>
+                        <li>Members using a <strong>punch card</strong> will have <strong>one punch deducted</strong>.</li>
+                        <li>Monthly, quarterly, and annual members enter normally with no extra charge.</li>
+                        <li>Non-members must purchase a membership before joining the competition.</li>
+                    </ol>
+
+                    <p>3. Flow</p>
+                    <ol>
+                        <li>Arrive 15 minutes early. Late arrivals are considered no-shows.</li>
+                        <li>Follow the judge's and staff's instructions and queue in order.</li>
+                        <li>After finishing a route, return to the back of the queue; no consecutive attempts on the same route.</li>
+                        <li>The last minute before time is reserved for score tallying; the judge's record is final.</li>
+                    </ol>
+
+                    <p>4. Safety & Equipment</p>
+                    <ol>
+                        <li>Wear athletic clothing. You may bring your own shoes and chalk bag.</li>
+                        <li>No climbing without climbing shoes. Tie up long hair. No sharp accessories.</li>
+                        <li>Check mats and safety area before climbing. Do not wear climbing shoes outside the climbing area.</li>
+                        <li>If you feel unwell or injured, stop immediately and inform staff.</li>
+                    </ol>
+
+                    <p>5. Discipline</p>
+                    <ol>
+                        <li>Impersonation, falsifying identity, interfering with judges, or tampering with routes is prohibited.</li>
+                        <li>Respect others. No shouting, pushing, insulting, or any form of discrimination.</li>
+                        <li>Violators may receive a warning, have a single route score cancelled, or be disqualified.</li>
+                        <li>The organizer reserves the right of final interpretation.</li>
+                    </ol>
+
+                    <h3>✍️ Participant's Pledge</h3>
+                    <p>I voluntarily register for this competition and pledge:</p>
+                    <ol>
+                        <li>I have read and understood all rules and will follow the organizer's and judges' instructions.</li>
+                        <li>I will compete under my true identity, without impersonation or falsification.</li>
+                        <li>I will compete fairly and not use any improper means to gain scores or disrupt others.</li>
+                        <li>I will respect the judges' decisions and raise any disagreement through proper channels.</li>
+                        <li>I will respect other climbers, staff, and spectators, and avoid any insulting, discriminatory, or dangerous behavior.</li>
+                        <li>I confirm I am physically fit to participate in climbing and accept the risks of participation.</li>
+                        <li>I consent to the organizer using my name, photos, and competition footage for promotional purposes.</li>
+                        <li>If I violate the above, I accept cancellation of scores or disqualification and bear the corresponding responsibility.</li>
+                    </ol>
+                    <p><strong>I have read, understood, and agree to all of the above.</strong></p>
+                </div>
+
+                <div class="agree-row">
+                    <input type="checkbox" id="agree" name="agree" required>
+                    <label for="agree">I have read and agree to the Competition Rules and Participant's Pledge</label>
+                </div>
+                <button type="submit" class="btn-submit" id="submit-btn">Register Now</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const numberInput = document.getElementById('number');
+        const numberStatus = document.getElementById('number_status');
+
+        numberInput.addEventListener('blur', async function() {
+            const numStr = this.value.trim();
+            if (numStr === '') { numberStatus.textContent = ''; numberStatus.className = 'number-status'; return; }
+            const n = parseInt(numStr);
+            if (isNaN(n) || n < 0 || n > 999) {
+                numberStatus.textContent = '❌ Number must be an integer between 0 and 999';
+                numberStatus.className = 'number-status err';
+                return;
+            }
+            try {
+                const res = await fetch(`/api/check_number/${n}`);
+                const data = await res.json();
+                if (data.taken) {
+                    numberStatus.textContent = `❌ Number ${n} is taken. Please choose another.`;
+                    numberStatus.className = 'number-status err';
+                } else {
+                    numberStatus.textContent = `✅ Number ${n} is available`;
+                    numberStatus.className = 'number-status ok';
+                }
+            } catch (err) {
+                numberStatus.textContent = '';
+                numberStatus.className = 'number-status';
+            }
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            const country = document.getElementById('country_code').value;
+            const phone = document.getElementById('phone').value.trim();
+            const agree = document.getElementById('agree').checked;
+            const cardType = document.getElementById('card_type').value;
+            const numberStr = numberInput.value.trim();
+            const msgEl = document.getElementById('message');
+
+            let valid = false;
+            if (country === '+86') valid = /^\d{11}$/.test(phone);
+            else if (country === '+852') valid = /^\d{8}$/.test(phone);
+            if (!valid) {
+                e.preventDefault();
+                msgEl.textContent = country === '+86' ? 'Mainland China phone must be 11 digits' : 'Hong Kong phone must be 8 digits';
+                msgEl.className = 'message error show';
+                msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                return;
+            }
+            if (!cardType) {
+                e.preventDefault();
+                msgEl.textContent = 'Please select a membership type. This competition is for members only.';
+                msgEl.className = 'message error show';
+                msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                return;
+            }
+            if (numberStr !== '') {
+                const n = parseInt(numberStr);
+                if (isNaN(n) || n < 0 || n > 999) {
+                    e.preventDefault();
+                    msgEl.textContent = 'Competition number must be an integer between 0 and 999';
+                    msgEl.className = 'message error show';
+                    msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    return;
+                }
+            }
+            if (!agree) {
+                e.preventDefault();
+                msgEl.textContent = 'Please read and agree to the rules and pledge before registering.';
+                msgEl.className = 'message error show';
+                msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+        });
+    </script>
+</body>
+</html>
