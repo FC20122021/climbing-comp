@@ -37,13 +37,22 @@
             margin-top: 8px; font-weight: bold; color: #1a418f;
             font-size: 21px; min-height: 28px; text-align: center;
         }
+
+        /* Fixed athlete card */
         .fixed-athlete {
             background: #e8f7ef; border: 1.5px solid #0dac67;
-            border-radius: 12px; padding: 16px; text-align: center;
+            border-radius: 12px; padding: 18px; text-align: center;
         }
-        .fixed-athlete .label { font-size: 14px; color: #1a418f; opacity: 0.7; margin-bottom: 6px; }
-        .fixed-athlete .number { font-size: 26px; font-weight: bold; color: #0dac67; }
-        .fixed-athlete .name { font-size: 18px; color: #1a418f; margin-top: 6px; }
+        .fixed-athlete .label {
+            font-size: 14px; color: #1a418f; opacity: 0.7; margin-bottom: 8px;
+        }
+        .fixed-athlete .number {
+            font-size: 28px; font-weight: bold; color: #0dac67;
+        }
+        .fixed-athlete .name {
+            font-size: 18px; color: #1a418f; margin-top: 8px;
+        }
+
         .buttons { display: flex; gap: 12px; margin-top: 20px; }
         .btn {
             flex: 1; padding: 18px 0; border: none; border-radius: 16px;
@@ -105,6 +114,7 @@
         </div>
         <div class="judge-info">Account: {{ judge_username }}</div>
 
+        <!-- Route selection -->
         <div class="form-group">
             <label>Select Route</label>
             <select id="route_id">
@@ -114,6 +124,7 @@
             </select>
         </div>
 
+        <!-- Climber number: auto-filled for judgeN accounts -->
         {% set auto_number = None %}
         {% if judge_username.startswith('judge') and judge_username[5:].isdigit() %}
             {% set auto_number = judge_username[5:] %}
@@ -147,6 +158,7 @@
         <div class="message" id="message"></div>
     </div>
 
+    <!-- Confirmation modal -->
     <div class="modal-overlay" id="confirm_modal">
         <div class="modal">
             <h2>Confirm Score</h2>
