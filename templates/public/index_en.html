@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Allez Climbing Gym</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px;
+        }
+        .page-wrapper { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
+        .hero { text-align: center; margin-bottom: 50px; }
+        .hero h1 { font-size: 42px; letter-spacing: 2px; margin-bottom: 12px; color: #1a418f; }
+        .hero .en-name { font-size: 18px; letter-spacing: 3px; color: #0dac67; margin-bottom: 16px; text-transform: uppercase; font-weight: 600; }
+        .hero .tagline { font-size: 16px; color: #1a418f; opacity: 0.75; min-height: 24px; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .card {
+            background: #ffffff; border: 2px solid #0dac67; border-radius: 16px;
+            padding: 26px 22px; transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(13,172,103,0.15); background: #e8f7ef; }
+        .card .icon { margin-bottom: 14px; display: flex; align-items: center; }
+        .card .icon svg { display: block; }
+        .card h3 { font-size: 18px; margin-bottom: 8px; color: #1a418f; }
+        .card p { font-size: 14px; color: #1a418f; opacity: 0.75; line-height: 1.7; }
+        .event-highlight { margin-bottom: 40px; }
+        .event-highlight h2 { font-size: 22px; color: #1a418f; margin-bottom: 16px; }
+        .event-card { background: #0dac67; border-radius: 16px; padding: 28px 24px; color: white; }
+        .event-card .event-name { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+        .event-card .event-meta { display: flex; flex-direction: column; gap: 8px; font-size: 15px; margin-bottom: 20px; opacity: 0.95; }
+        .event-card .event-btn {
+            display: inline-block; padding: 12px 24px; background: #ffffff; color: #0dac67;
+            text-decoration: none; font-size: 16px; font-weight: 700; border-radius: 10px; transition: transform 0.2s;
+        }
+        .event-card .event-btn:hover { transform: translateX(4px); }
+        .about {
+            background: #e8f7ef; border: 2px solid #0dac67; border-radius: 16px;
+            padding: 34px 30px; line-height: 1.9; font-size: 15px; color: #1a418f;
+        }
+        .about h2 { font-size: 24px; margin-bottom: 20px; color: #0dac67; padding-bottom: 12px; border-bottom: 2px solid #0dac67; }
+        .about p { margin-bottom: 16px; }
+        .about p:last-child { margin-bottom: 0; }
+        .footer { text-align: center; margin-top: 40px; font-size: 13px; color: #1a418f; opacity: 0.5; }
+        @media (max-width: 768px) {
+            body { margin-left: 0; padding-top: 64px; }
+            .hero h1 { font-size: 28px; letter-spacing: 1px; }
+            .hero .en-name { font-size: 14px; letter-spacing: 2px; }
+            .page-wrapper { padding: 40px 18px; }
+            .event-card .event-name { font-size: 20px; }
+            .about { padding: 24px 20px; }
+            .about h2 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    {% include '_public_nav.html' %}
+    <div class="page-wrapper">
+        <div class="hero">
+            <h1>Allez Climbing Gym</h1>
+            <div class="en-name">Allez Climbing</div>
+            <p class="tagline">Climb. Connect. Explore.</p>
+        </div>
+
+        <div class="event-highlight">
+            <h2>🔥 Upcoming Event</h2>
+            <div class="event-card">
+                <div class="event-name">Ale 2.0 Women's Bouldering Warm-up Competition</div>
+                <div class="event-meta">
+                    <span>📅 September 19, 2026 · 7:00 PM – 9:00 PM</span>
+                    <span>📍 Allez Climbing Gym 1.0</span>
+                    <span>🗺️ Room 401, Anime Building, No. 2008 Yijing Road, Huangbei Street, Luohu District, Shenzhen</span>
+                    <span>👩 Female members only</span>
+                </div>
+                <a href="/signup" class="event-btn">Register Now →</a>
+            </div>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#0dac67" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 20 L12 4 L18 20"/><path d="M9 14 L15 14"/><circle cx="12" cy="4" r="1.2" fill="#0dac67"/>
+                    </svg>
+                </div>
+                <h3>Quality Routes</h3>
+                <p>Routes for every level, from beginner to advanced, reset regularly. There's always a challenge for you.</p>
+            </div>
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#0dac67" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/>
+                        <path d="M3 20 c0-3.5 3-5.5 6-5.5 s6 2 6 5.5"/><path d="M15 20 c0-2.5 2-4.2 4.5-4.2 s3 1.2 3 4.2"/>
+                    </svg>
+                </div>
+                <h3>Community</h3>
+                <p>A warm and friendly climbing community where you can always find partners to climb and grow with.</p>
+            </div>
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#0dac67" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 4 h8 v3 a4 4 0 0 1 -8 0 z"/><path d="M8 5 H5 v1 a3 3 0 0 0 3 3"/>
+                        <path d="M16 5 h3 v1 a3 3 0 0 1 -3 3"/><path d="M10 11 v3 h4 v-3"/>
+                        <path d="M8 20 h8"/><path d="M10 14 h4 v6 h-4 z"/>
+                    </svg>
+                </div>
+                <h3>Regular Competitions</h3>
+                <p>We host climbing competitions from time to time. Join us, win prizes and honor.</p>
+            </div>
+        </div>
+
+        <div class="about">
+            <h2>About Us</h2>
+            <p>Allez Climbing Gym started in 2021 on the fourth floor of the Anime Building in Luohu. Back then it was just a group of climbers looking for a place to climb, chat, and hang out. More and more people came, and it grew into what it is today.</p>
+            <p>We have 450 sqm of bouldering, top-rope, and lead walls, with over 80 routes that get reset regularly. Easy ones, hard ones — beginners have fun, and experienced climbers find their challenges. All our coaches are certified, and we keep an AED on site. Safety is never a compromise here.</p>
+            <p>But Allez is more than a climbing gym. Our co-founder Edison is always on the move — leading beach clean-ups, organizing swap meets and English salons, and, of course, taking climbers outdoors to real rock. If you'd like to try outdoor climbing, just ask him. Many people say what makes Allez special is the people. Whether you climb well or not, whether you have a partner or not, someone will say hi when you walk in. Climbing shouldn't be a solo thing anyway.</p>
+            <p>Come by, climb a bit, chat a bit, and meet a few new friends.</p>
+        </div>
+
+        <div class="footer">© 2026 Allez Climbing Gym · All rights reserved</div>
+    </div>
+</body>
+</html>
