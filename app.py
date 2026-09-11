@@ -2,8 +2,8 @@
 """
 攀岩比赛系统 - 报名 + 打分 + 权限区分
 适配 Render 部署（数据库使用 /tmp 目录）
-角色：admin（管理员，全部权限）、judge（裁判，仅打分）
-报名需同意守则，仅限会员，可选比赛编号，成功后跳转海报页
+选手用 judgeN 账号登录时，打分自动使用 N 作为选手编号
+支持中英双语（首页、报名页、登录页、裁判打分页）
 """
 
 import os
@@ -18,7 +18,6 @@ from openpyxl import Workbook
 # -------------------- 应用初始化 --------------------
 app = Flask(__name__)
 
-# 数据库路径：Render 使用 /tmp，本地使用 /tmp 也能正常跑（Windows 会报错，所以做兼容）
 if os.path.exists('/tmp'):
     db_path = os.path.join('/tmp', 'climbing.db')
 else:
@@ -86,7 +85,6 @@ class CompetitionState(db.Model):
 
 
 # -------------------- 启动时初始化数据库 --------------------
-# 无论用 python app.py 还是 gunicorn 启动，都会执行
 with app.app_context():
     try:
         db.create_all()
@@ -115,7 +113,6 @@ with app.app_context():
         db.session.rollback()
 
 
-# 兼容本地运行时仍可调用的旧函数（保留但不再被 __main__ 调用）
 def init_db():
     with app.app_context():
         db.create_all()
@@ -252,9 +249,19 @@ def admin_required(f):
     return decorated_function
 
 
+# -------------------- 语言切换 --------------------
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in ['zh', 'en']:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('index'))
+
+
 # -------------------- 首页入口 --------------------
 @app.route('/')
 def index():
+    if session.get('lang') == 'en':
+        return render_template('public/index_en.html')
     return render_template('public/index.html')
 
 
@@ -269,6 +276,8 @@ def competitions():
 def signup():
     message = request.args.get('message', '')
     msg_type = request.args.get('type', 'success')
+    if session.get('lang') == 'en':
+        return render_template('public/signup_en.html', message=message, msg_type=msg_type)
     return render_template('public/signup.html', message=message, msg_type=msg_type)
 
 
@@ -288,48 +297,50 @@ def signup_post():
     number_str = request.form.get('number', '').strip()
     agree = request.form.get('agree')
 
+    is_en = session.get('lang') == 'en'
+
     if not name:
-        return redirect(url_for('signup', message='姓名不能为空', type='error'))
+        return redirect(url_for('signup', message='Name is required' if is_en else '姓名不能为空', type='error'))
 
     if not phone:
-        return redirect(url_for('signup', message='手机号不能为空', type='error'))
+        return redirect(url_for('signup', message='Phone is required' if is_en else '手机号不能为空', type='error'))
 
     if country_code == '+86':
         if len(phone) != 11 or not phone.isdigit():
-            return redirect(url_for('signup', message='中国大陆手机号应为11位数字', type='error'))
+            return redirect(url_for('signup', message='Mainland China phone must be 11 digits' if is_en else '中国大陆手机号应为11位数字', type='error'))
     elif country_code == '+852':
         if len(phone) != 8 or not phone.isdigit():
-            return redirect(url_for('signup', message='香港手机号应为8位数字', type='error'))
+            return redirect(url_for('signup', message='Hong Kong phone must be 8 digits' if is_en else '香港手机号应为8位数字', type='error'))
     else:
-        return redirect(url_for('signup', message='暂不支持该国家代码', type='error'))
+        return redirect(url_for('signup', message='Unsupported country code' if is_en else '暂不支持该国家代码', type='error'))
 
     if not agree:
-        return redirect(url_for('signup', message='请阅读并同意比赛守则和承诺书后再报名', type='error'))
+        return redirect(url_for('signup', message='Please agree to the rules and pledge' if is_en else '请阅读并同意比赛守则和承诺书后再报名', type='error'))
 
     if not card_type:
-        return redirect(url_for('signup', message='请选择会员卡类型，本次比赛仅限会员参加', type='error'))
+        return redirect(url_for('signup', message='Please select a membership type' if is_en else '请选择会员卡类型，本次比赛仅限会员参加', type='error'))
 
     number = None
     if number_str:
         try:
             number = int(number_str)
         except ValueError:
-            return redirect(url_for('signup', message='比赛编号必须是数字', type='error'))
+            return redirect(url_for('signup', message='Number must be a digit' if is_en else '比赛编号必须是数字', type='error'))
         if number < 0 or number > 999:
-            return redirect(url_for('signup', message='比赛编号必须在 0 到 999 之间', type='error'))
+            return redirect(url_for('signup', message='Number must be between 0 and 999' if is_en else '比赛编号必须在 0 到 999 之间', type='error'))
         existing_number = Athlete.query.filter_by(number=number).first()
         if existing_number:
-            return redirect(url_for('signup', message=f'编号 {number} 已被占用，请选择其他编号', type='error'))
+            return redirect(url_for('signup', message=f'Number {number} is taken' if is_en else f'编号 {number} 已被占用，请选择其他编号', type='error'))
 
     full_phone = f'{country_code}{phone}'
 
     existing_name = Athlete.query.filter_by(name=name).first()
     if existing_name:
-        return redirect(url_for('signup', message='该姓名/昵称已被使用', type='error'))
+        return redirect(url_for('signup', message='This name is already used' if is_en else '该姓名/昵称已被使用', type='error'))
 
     existing_phone = Athlete.query.filter_by(phone=full_phone).first()
     if existing_phone:
-        return redirect(url_for('signup', message='该手机号已报名', type='error'))
+        return redirect(url_for('signup', message='This phone is already registered' if is_en else '该手机号已报名', type='error'))
 
     new_athlete = Athlete(
         name=name,
@@ -348,7 +359,7 @@ def signup_post():
         db.session.commit()
     except:
         db.session.rollback()
-        return redirect(url_for('signup', message='报名失败，请检查信息是否重复', type='error'))
+        return redirect(url_for('signup', message='Registration failed' if is_en else '报名失败，请检查信息是否重复', type='error'))
 
     return redirect(url_for('poster'))
 
@@ -357,7 +368,7 @@ def signup_post():
 @app.route('/api/check_number/<int:number>')
 def api_check_number(number):
     if number < 0 or number > 999:
-        return jsonify({'taken': True, 'error': '编号超出范围'})
+        return jsonify({'taken': True, 'error': 'Number out of range'})
     athlete = Athlete.query.filter_by(number=number).first()
     return jsonify({'taken': athlete is not None})
 
@@ -371,6 +382,8 @@ def poster():
 # -------------------- 裁判登录/登出 --------------------
 @app.route('/judge/login', methods=['GET'])
 def judge_login():
+    if session.get('lang') == 'en':
+        return render_template('auth/judge_login_en.html', error=None)
     return render_template('auth/judge_login.html', error=None)
 
 
@@ -387,6 +400,8 @@ def judge_login_post():
             return redirect(url_for('admin_control'))
         else:
             return redirect(url_for('judge_dashboard'))
+    if session.get('lang') == 'en':
+        return render_template('auth/judge_login_en.html', error='Invalid username or password')
     return render_template('auth/judge_login.html', error='用户名或密码错误')
 
 
@@ -403,6 +418,8 @@ def judge_logout():
 @judge_required
 def judge_dashboard():
     routes = Route.query.all()
+    if session.get('lang') == 'en':
+        return render_template('judge/judge_en.html', routes=routes, judge_username=session.get('judge_username'))
     return render_template('judge/judge.html', routes=routes, judge_username=session.get('judge_username'))
 
 
@@ -425,9 +442,14 @@ def api_submit_score():
         return jsonify({'error': '比赛尚未开始或已结束，无法提交成绩'}), 400
 
     data = request.get_json()
-    athlete_number = data.get('athlete_number')
     route_id = data.get('route_id')
     result = data.get('result')
+
+    judge_username = session.get('judge_username', '')
+    if judge_username.startswith('judge') and judge_username[5:].isdigit():
+        athlete_number = int(judge_username[5:])
+    else:
+        athlete_number = data.get('athlete_number')
 
     if not athlete_number or not route_id or result not in ['fail', 'zone', 'top']:
         return jsonify({'error': '参数错误'}), 400
@@ -658,7 +680,6 @@ def admin_start():
     return redirect(url_for('leaderboard_page'))
 
 
-# -------------------- 批量生成选手账号 --------------------
 @app.route('/admin/create_judge_accounts', methods=['POST'])
 @admin_required
 def create_judge_accounts():
@@ -679,7 +700,6 @@ def create_judge_accounts():
     return redirect(url_for('admin_control', message=msg, type='success'))
 
 
-# -------------------- 导出功能 --------------------
 @app.route('/admin/export_ranking')
 @admin_required
 def export_ranking():
