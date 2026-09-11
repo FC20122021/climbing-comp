@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>报名记录管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px; padding: 30px 20px;
+        }
+        .container {
+            max-width: 1100px; margin: 0 auto; background: #ffffff;
+            border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.08); padding: 30px 24px;
+        }
+        h1 { font-size: 26px; color: #1a418f; margin-bottom: 24px; text-align: center; }
+        .toolbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+        .btn-export {
+            background: #0dac67; color: white; padding: 12px 20px;
+            border-radius: 10px; text-decoration: none; font-size: 15px;
+            font-weight: 600; transition: background-color 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-export:hover { background: #0a8a53; }
+        .table-wrapper {
+            width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+            border-radius: 12px; border: 1.5px solid #0dac67;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; background: white; }
+        th, td {
+            padding: 14px 12px; text-align: left;
+            border-bottom: 1px solid #e8f7ef; font-size: 15px; color: #1a418f;
+        }
+        th { background: #f3dfae; font-weight: 700; white-space: nowrap; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f6fdf9; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #1a418f; opacity: 0.6; font-size: 16px; }
+        @media (max-width: 768px) {
+            body { margin-left: 0; padding-top: 80px; }
+            .container { padding: 24px 18px; border-radius: 20px; }
+            h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    {% include '_nav.html' %}
+    <div class="container">
+        <h1>📋 报名记录</h1>
+        <div class="toolbar">
+            <a href="{{ url_for('export_signups') }}" class="btn-export">⬇ 导出 Excel</a>
+        </div>
+        {% if athletes %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>编号</th><th>姓名</th><th>手机号</th><th>水平</th>
+                        <th>会员卡</th><th>攀岩年限</th><th>频率</th><th>常来日</th>
+                        <th>了解渠道</th><th>比赛渠道</th><th>报名时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for athlete in athletes %}
+                    <tr>
+                        <td>{{ athlete.number or '—' }}</td>
+                        <td>{{ athlete.name }}</td>
+                        <td>{{ athlete.phone }}</td>
+                        <td>{{ athlete.level or '—' }}</td>
+                        <td>{{ athlete.card_type or '—' }}</td>
+                        <td>{{ athlete.climbing_years or '—' }}</td>
+                        <td>{{ athlete.climbing_frequency or '—' }}</td>
+                        <td>{{ athlete.climbing_days or '—' }}</td>
+                        <td>{{ athlete.discovery_channel or '—' }}</td>
+                        <td>{{ athlete.competition_channel or '—' }}</td>
+                        <td>{{ athlete.created_at.strftime('%Y-%m-%d %H:%M') if athlete.created_at else '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">暂无报名记录</div>
+        {% endif %}
+    </div>
+</body>
+</html>

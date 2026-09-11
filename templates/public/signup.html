@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ale 2.0 预热女子攀石比赛 · 报名</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px;
+        }
+        .page-wrapper { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
+        .container {
+            background: #ffffff; border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.1); padding: 32px 28px;
+        }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 28px; color: #1a418f; margin-bottom: 6px; }
+        .header p { color: #1a418f; opacity: 0.7; font-size: 15px; }
+        .event-info {
+            text-align: center; color: #1a418f; font-size: 15px;
+            background: #e8f7ef; border: 1.5px solid #0dac67;
+            border-radius: 12px; padding: 14px; margin-bottom: 20px; font-weight: 600;
+            line-height: 1.9;
+        }
+        .section-title {
+            font-size: 17px; color: #1a418f; font-weight: 700;
+            margin: 26px 0 14px; padding-bottom: 8px;
+            border-bottom: 2px solid #0dac67;
+        }
+        .section-title:first-of-type { margin-top: 0; }
+
+        /* 提示信息（非必填说明） */
+        .section-note {
+            background: #f3dfae;
+            border-left: 4px solid #0dac67;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1a418f;
+            line-height: 1.7;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 15px; color: #1a418f; margin-bottom: 8px; font-weight: 600; }
+        .phone-row { display: flex; gap: 8px; }
+        .phone-row select {
+            width: 110px; padding: 12px 10px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; font-size: 16px; background: #fff; color: #1a418f;
+            appearance: none; -webkit-appearance: none;
+        }
+        .phone-row input {
+            flex: 1; padding: 12px 14px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; font-size: 16px; background: #fff; color: #1a418f;
+        }
+        input:focus, select:focus { outline: none; border-color: #0dac67; box-shadow: 0 0 0 3px rgba(13,172,103,0.15); }
+        .full-input, .level-select {
+            width: 100%; padding: 12px 14px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; font-size: 16px; background: #fff; color: #1a418f;
+        }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 4px 0; }
+        .checkbox-group label {
+            display: flex; align-items: center; gap: 6px;
+            font-weight: 500; font-size: 15px; color: #1a418f; cursor: pointer; margin: 0;
+        }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #0dac67; }
+        .rules-box {
+            background: #e8f7ef; border: 1.5px solid #0dac67;
+            border-radius: 12px; padding: 20px; font-size: 14px;
+            color: #1a418f; line-height: 1.8; max-height: 420px; overflow-y: auto;
+        }
+        .rules-box h3 { font-size: 16px; color: #1a418f; margin-bottom: 10px; margin-top: 16px; font-weight: 700; }
+        .rules-box h3:first-child { margin-top: 0; }
+        .rules-box p { margin-top: 10px; margin-bottom: 4px; font-weight: 600; color: #1a418f; }
+        .rules-box ol { padding-left: 22px; margin-bottom: 6px; }
+        .rules-box ul { padding-left: 18px; margin-top: 4px; }
+        .rules-box li { margin-bottom: 5px; }
+        .agree-row {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin: 20px 0 18px; font-size: 15px; color: #1a418f;
+        }
+        .agree-row input[type="checkbox"] {
+            width: 20px; height: 20px; margin-top: 1px; cursor: pointer;
+            flex-shrink: 0; accent-color: #0dac67;
+        }
+        .agree-row label { margin: 0; font-weight: 500; cursor: pointer; }
+        .btn-submit {
+            width: 100%; padding: 18px; background: #0dac67; color: white;
+            border: none; border-radius: 12px; font-size: 19px; font-weight: 700;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-submit:hover { background: #0a8a53; }
+        .message {
+            padding: 14px 18px; border-radius: 10px; margin-bottom: 20px;
+            font-size: 15px; text-align: center; display: none;
+        }
+        .message.show { display: block; }
+        .message.error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+        .message.success { background: #e8f7ef; color: #0dac67; border: 1px solid #0dac67; }
+
+        /* 编号校验状态 */
+        .number-status {
+            margin-top: 4px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .number-status.ok { color: #0dac67; }
+        .number-status.err { color: #e74c3c; }
+
+        @media (max-width: 768px) {
+            body { margin-left: 0; padding-top: 64px; }
+            .page-wrapper { padding: 20px; }
+            .container { padding: 26px 20px; border-radius: 20px; }
+            .header h1 { font-size: 22px; }
+            .rules-box { max-height: 300px; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    {% include '_public_nav.html' %}
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Ale 2.0 预热女子攀石比赛</h1>
+                <p>填写信息，加入比赛</p>
+            </div>
+            <div class="event-info">
+                📅 比赛时间：2026年9月19日 19:00–21:00（共2小时）<br>
+                📍 比赛地点：Allez Climbing Gym 阿叻室内攀岩馆 1.0<br>
+                🗺️ 地址：深圳市罗湖区黄贝街道怡景路2008号动漫大厦401<br>
+                🎫 参赛免费 · 需会员入场 · 次卡消耗 1 次<br>
+                ⚠️ 本次比赛仅限女性会员参加
+            </div>
+            <div id="message" class="message {{ msg_type }} {% if message %}show{% endif %}">{{ message }}</div>
+
+            <form action="{{ url_for('signup_post') }}" method="POST" id="signup-form">
+                <div class="section-title">一、个人信息</div>
+                <div class="form-group">
+                    <label for="name">姓名 / 昵称 <span style="color:#e74c3c;">*</span></label>
+                    <input type="text" id="name" name="name" placeholder="请输入姓名或昵称" required class="full-input">
+                </div>
+                <div class="form-group">
+                    <label for="phone">手机号 <span style="color:#e74c3c;">*</span></label>
+                    <div class="phone-row">
+                        <select id="country_code" name="country_code">
+                            <option value="+86">+86</option>
+                            <option value="+852">+852</option>
+                        </select>
+                        <input type="tel" id="phone" name="phone" placeholder="请输入手机号" required>
+                    </div>
+                    <small style="display:block; margin-top:6px; color:#1a418f; opacity:0.6;">请选择国家代码并输入相应位数的手机号</small>
+                </div>
+                <div class="form-group">
+                    <label for="card_type">会员卡类型 <span style="color:#e74c3c;">*</span></label>
+                    <select id="card_type" name="card_type" class="level-select" required>
+                        <option value="">请选择会员卡类型</option>
+                        <option value="月卡">月卡</option>
+                        <option value="季卡">季卡</option>
+                        <option value="年卡">年卡</option>
+                        <option value="次卡">次卡</option>
+                    </select>
+                    <small style="display:block; margin-top:6px; color:#e74c3c;">本次比赛仅限会员参加，非会员请先办理会员卡</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="number">选择你的比赛编号（0–999，可选）</label>
+                    <input type="number" id="number" name="number" min="0" max="999" placeholder="输入 0 到 999 的数字" class="full-input">
+                    <div id="number_status" class="number-status"></div>
+                    <small style="display:block; margin-top:2px; color:#1a418f; opacity:0.65;">
+                        先到先得，如被占用请选择其他编号。不填则由主办方统一分配。
+                    </small>
+                </div>
+
+                <div class="section-note">
+                    📝 以下信息将帮助我们更好地了解岩友群体、优化课程与活动安排，感谢你愿意分享。
+                </div>
+                <div class="section-title" style="margin-top: 0;">二、攀岩背景</div>
+                <div class="form-group">
+                    <label for="level">攀岩水平</label>
+                    <select id="level" name="level" class="level-select">
+                        <option value="">请选择</option>
+                        <option value="V0">V0</option><option value="V1">V1</option><option value="V2">V2</option>
+                        <option value="V3">V3</option><option value="V4">V4</option><option value="V5">V5</option>
+                        <option value="V6">V6</option><option value="V7">V7</option><option value="V8及以上">V8及以上</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="climbing_years">攀岩多久了</label>
+                    <select id="climbing_years" name="climbing_years" class="level-select">
+                        <option value="">请选择</option>
+                        <option value="不到半年">不到半年</option>
+                        <option value="半年到1年">半年到1年</option>
+                        <option value="1-2年">1-2年</option>
+                        <option value="2-3年">2-3年</option>
+                        <option value="3-5年">3-5年</option>
+                        <option value="5年以上">5年以上</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="climbing_frequency">攀岩频率</label>
+                    <select id="climbing_frequency" name="climbing_frequency" class="level-select">
+                        <option value="">请选择</option>
+                        <option value="每周1次以下">每周1次以下</option>
+                        <option value="每周1-2次">每周1-2次</option>
+                        <option value="每周3-4次">每周3-4次</option>
+                        <option value="每周5次以上">每周5次以上</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>平时周几来（可多选）</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="climbing_days" value="周一"> 周一</label>
+                        <label><input type="checkbox" name="climbing_days" value="周二"> 周二</label>
+                        <label><input type="checkbox" name="climbing_days" value="周三"> 周三</label>
+                        <label><input type="checkbox" name="climbing_days" value="周四"> 周四</label>
+                        <label><input type="checkbox" name="climbing_days" value="周五"> 周五</label>
+                        <label><input type="checkbox" name="climbing_days" value="周六"> 周六</label>
+                        <label><input type="checkbox" name="climbing_days" value="周日"> 周日</label>
+                        <label><input type="checkbox" name="climbing_days" value="不固定"> 不固定</label>
+                    </div>
+                </div>
+
+                <div class="section-title">三、您是如何了解到我们的</div>
+                <div class="form-group">
+                    <label for="discovery_channel">怎么知道 Allez Climbing Gym 的</label>
+                    <select id="discovery_channel" name="discovery_channel" class="level-select">
+                        <option value="">请选择</option>
+                        <option value="岩友推荐">岩友推荐</option>
+                        <option value="朋友介绍">朋友介绍</option>
+                        <option value="小红书">小红书</option>
+                        <option value="抖音">抖音</option>
+                        <option value="大众点评/美团">大众点评 / 美团</option>
+                        <option value="微信公众号">微信公众号</option>
+                        <option value="路过看到">路过看到</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="competition_channel">怎么知道这次比赛的</label>
+                    <select id="competition_channel" name="competition_channel" class="level-select">
+                        <option value="">请选择</option>
+                        <option value="岩馆公众号">岩馆公众号</option>
+                        <option value="微信群">微信群</option>
+                        <option value="岩友告知">岩友告知</option>
+                        <option value="小红书">小红书</option>
+                        <option value="抖音">抖音</option>
+                        <option value="现场海报">现场海报</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <div class="section-title">四、比赛规则与承诺书</div>
+                <div class="rules-box">
+                    <h3>📋 攀岩比赛规则（选手版）</h3>
+
+                    <p>一、比赛形式</p>
+                    <ol>
+                        <li>本次比赛为攀石赛，设若干条线路，具体数量以现场公布为准。</li>
+                        <li>选手须在指定时间内完成攀爬，超时成绩无效。</li>
+                        <li>每条线路均设有得分点（Zone）和完攀点（Top），得分规则如下：
+                            <ul>
+                                <li>完攀（Top）：25 分</li>
+                                <li>仅到达得分点（Zone）：10 分</li>
+                                <li>未到达任何计分点：0 分</li>
+                            </ul>
+                        </li>
+                        <li>每次坠落或失败尝试扣 0.1 分。扣分仅在选手最终取得 Top 或 Zone 时生效；若未取得任何计分点，该线路不扣分。</li>
+                        <li>最终成绩按总积分排名。若总积分相同，依次比较 Top 数量、Zone 数量、失败尝试总次数，少者列前；仍相同则并列。</li>
+                    </ol>
+
+                    <p>二、参赛费用与入场</p>
+                    <ol>
+                        <li>本次比赛<strong>不收取参赛费</strong>。</li>
+                        <li>参赛选手须为 Allez Climbing Gym 阿叻室内攀岩馆的会员，且需正常入场方可参加比赛。</li>
+                        <li>使用<strong>次卡</strong>的会员，每场比赛将<strong>消耗一次</strong>入场次数。</li>
+                        <li>月卡、季卡、年卡会员按正常入场流程入场即可，不额外扣费。</li>
+                        <li>非会员或未办理会员卡的选手，须先办理会员卡后方可参赛。</li>
+                    </ol>
+
+                    <p>三、比赛流程</p>
+                    <ol>
+                        <li>选手须提前 15 分钟到场签到，迟到视为自动放弃。</li>
+                        <li>比赛期间须听从裁判和工作人员指挥，按顺序排队攀爬。</li>
+                        <li>完成一条线路后须回到队尾重新排队，不得连续攀爬同一线路。</li>
+                        <li>比赛结束前 1 分钟为缓冲统计时间，以裁判最终记录为准。</li>
+                    </ol>
+
+                    <p>四、安全与装备</p>
+                    <ol>
+                        <li>选手须穿着运动服装，可自备攀岩鞋、镁粉袋等装备。</li>
+                        <li>未穿攀岩鞋者不得上墙；长发须扎起，不得佩戴尖锐饰品。</li>
+                        <li>攀爬前须确认垫子位置和安全区域，禁止在非攀爬区穿攀岩鞋。</li>
+                        <li>如身体不适或受伤，应立即停止攀爬并告知工作人员。</li>
+                    </ol>
+
+                    <p>五、纪律与处罚</p>
+                    <ol>
+                        <li>严禁替赛、伪造身份、干扰裁判、破坏线路标记等行为。</li>
+                        <li>尊重其他选手，禁止大声喧哗、推挤、辱骂或任何形式的歧视。</li>
+                        <li>违反规则者，裁判有权给予警告、取消单条线路成绩或取消比赛资格。</li>
+                        <li>比赛规则最终解释权归主办方所有。</li>
+                    </ol>
+
+                    <h3>✍️ 选手诚信参赛承诺书</h3>
+                    <p>本人自愿报名参加本次攀岩比赛，并郑重承诺：</p>
+                    <ol>
+                        <li>我已认真阅读并理解全部比赛规则，愿意遵守主办方和裁判的各项安排。</li>
+                        <li>我保证以真实身份参赛，不替赛、不冒名、不伪造任何信息。</li>
+                        <li>我保证公平竞争，不使用任何违规手段获取成绩或干扰他人。</li>
+                        <li>我保证尊重裁判判罚，如有异议将通过正当渠道申诉，不扰乱比赛秩序。</li>
+                        <li>我保证尊重其他选手、工作人员和观众，不做出任何侮辱、歧视或危险行为。</li>
+                        <li>我确认自身健康状况良好，适合参加攀岩运动，并愿意自行承担参赛风险。</li>
+                        <li>我同意主办方在比赛宣传中合理使用我的姓名、照片及比赛影像。</li>
+                        <li>如违反上述承诺，我愿意接受主办方取消成绩、取消资格等处理，并承担相应责任。</li>
+                    </ol>
+                    <p><strong>本人已阅读、理解并同意以上全部内容，自愿签署本承诺书。</strong></p>
+                </div>
+
+                <div class="agree-row">
+                    <input type="checkbox" id="agree" name="agree" required>
+                    <label for="agree">我已阅读并同意《攀岩比赛规则》和《选手诚信参赛承诺书》</label>
+                </div>
+                <button type="submit" class="btn-submit" id="submit-btn">立即报名</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 编号实时校验
+        const numberInput = document.getElementById('number');
+        const numberStatus = document.getElementById('number_status');
+
+        numberInput.addEventListener('blur', async function() {
+            const numStr = this.value.trim();
+            if (numStr === '') {
+                numberStatus.textContent = '';
+                numberStatus.className = 'number-status';
+                return;
+            }
+            const n = parseInt(numStr);
+            if (isNaN(n) || n < 0 || n > 999) {
+                numberStatus.textContent = '❌ 编号必须是 0 到 999 之间的整数';
+                numberStatus.className = 'number-status err';
+                return;
+            }
+            try {
+                const res = await fetch(`/api/check_number/${n}`);
+                const data = await res.json();
+                if (data.taken) {
+                    numberStatus.textContent = `❌ 编号 ${n} 已被占用，请换一个`;
+                    numberStatus.className = 'number-status err';
+                } else {
+                    numberStatus.textContent = `✅ 编号 ${n} 可用`;
+                    numberStatus.className = 'number-status ok';
+                }
+            } catch (err) {
+                numberStatus.textContent = '';
+                numberStatus.className = 'number-status';
+            }
+        });
+
+        // 提交时校验
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            const country = document.getElementById('country_code').value;
+            const phone = document.getElementById('phone').value.trim();
+            const agree = document.getElementById('agree').checked;
+            const cardType = document.getElementById('card_type').value;
+            const numberStr = numberInput.value.trim();
+            const msgEl = document.getElementById('message');
+
+            let valid = false;
+            if (country === '+86') valid = /^\d{11}$/.test(phone);
+            else if (country === '+852') valid = /^\d{8}$/.test(phone);
+            if (!valid) {
+                e.preventDefault();
+                msgEl.textContent = country === '+86' ? '中国大陆手机号应为11位数字' : '香港手机号应为8位数字';
+                msgEl.className = 'message error show';
+                msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                return;
+            }
+
+            if (!cardType) {
+                e.preventDefault();
+                msgEl.textContent = '请选择会员卡类型，本次比赛仅限会员参加';
+                msgEl.className = 'message error show';
+                msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                return;
+            }
+
+            if (numberStr !== '') {
+                const n = parseInt(numberStr);
+                if (isNaN(n) || n < 0 || n > 999) {
+                    e.preventDefault();
+                    msgEl.textContent = '比赛编号必须是 0 到 999 之间的整数';
+                    msgEl.className = 'message error show';
+                    msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    return;
+                }
+            }
+
+            if (!agree) {
+                e.preventDefault();
+                msgEl.textContent = '请阅读并同意比赛规则和承诺书后再报名';
+                msgEl.className = 'message error show';
+                msgEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+        });
+    </script>
+</body>
+</html>

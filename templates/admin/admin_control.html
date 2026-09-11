@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>比赛控制台 · Ale 2.0 预热女子攀石比赛</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px;
+        }
+        .container {
+            max-width: 640px; margin: 40px auto; background: #ffffff;
+            border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.1); padding: 36px 28px;
+        }
+        h1 { text-align: center; margin-bottom: 12px; color: #1a418f; font-size: 28px; }
+        .event-name {
+            text-align: center; color: #0dac67; font-weight: 700;
+            font-size: 17px; margin-bottom: 6px;
+        }
+        .event-location {
+            text-align: center; color: #1a418f; opacity: 0.75;
+            font-size: 14px; margin-bottom: 24px; line-height: 1.7;
+        }
+        .status-box {
+            text-align: center; margin-bottom: 24px; padding: 24px;
+            background: #e8f7ef; border-radius: 14px; border: 2px solid #0dac67;
+        }
+        .status-box p { font-size: 17px; margin-bottom: 8px; color: #1a418f; opacity: 0.7; }
+        .status-box .status { font-weight: bold; font-size: 32px; color: #1a418f; }
+        .status-box .remaining { margin-top: 12px; font-size: 22px; font-weight: 700; color: #0dac67; }
+
+        .btn-start {
+            width: 100%; padding: 18px; background: #0dac67; color: white;
+            border: none; border-radius: 14px; font-size: 21px; font-weight: 700;
+            cursor: pointer; transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(13,172,103,0.25);
+        }
+        .btn-start:hover { background: #0a8a53; }
+        .btn-start:active { transform: scale(0.98); }
+        .btn-start:disabled { background: #b0bec5; cursor: not-allowed; box-shadow: none; }
+
+        /* 账号生成区块 */
+        .account-section {
+            margin-top: 24px; padding: 20px;
+            background: #f3dfae; border-radius: 14px;
+        }
+        .account-section h3 {
+            font-size: 16px; color: #1a418f;
+            margin-bottom: 10px; font-weight: 700;
+        }
+        .account-section p {
+            font-size: 14px; color: #1a418f;
+            line-height: 1.7; margin-bottom: 14px; opacity: 0.85;
+        }
+        .btn-account {
+            width: 100%; padding: 14px; background: #1a418f; color: white;
+            border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-account:hover { background: #132f6b; }
+
+        .message { margin-top: 15px; text-align: center; font-size: 15px; min-height: 20px; }
+        .message .error { color: #e74c3c; }
+        .message .success { color: #0dac67; }
+
+        @media (max-width: 768px) {
+            body { margin-left: 0; padding-top: 64px; }
+            .container { margin: 30px auto; padding: 26px 20px; border-radius: 20px; }
+            h1 { font-size: 22px; }
+            .event-name { font-size: 15px; }
+            .event-location { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    {% include '_nav.html' %}
+    <div class="container">
+        <h1>🎮 比赛控制台</h1>
+        <div class="event-name">Ale 2.0 预热女子攀石比赛</div>
+        <div class="event-location">
+            Allez Climbing Gym 阿叻室内攀岩馆 1.0<br>
+            深圳市罗湖区黄贝街道怡景路2008号动漫大厦401
+        </div>
+
+        <div class="status-box">
+            <p>当前状态</p>
+            <div class="status" id="status_text">加载中...</div>
+            <div class="remaining" id="remaining"></div>
+        </div>
+
+        <form action="/admin/start" method="POST">
+            <button type="submit" class="btn-start" id="start_btn">开始比赛</button>
+        </form>
+
+        <!-- 批量生成账号 -->
+        <div class="account-section">
+            <h3>🔑 生成选手打分账号</h3>
+            <p>
+                为所有已分配比赛编号的选手批量创建账号，账号名为 <code>judge + 编号</code>，统一密码为 <strong>ale26666</strong>。<br>
+                已存在的账号会自动跳过。<strong>比赛开始前使用一次即可。</strong>
+            </p>
+            <form action="/admin/create_judge_accounts" method="POST"
+                  onsubmit="return confirm('确认要为所有已编号的选手批量创建打分账号吗？');">
+                <button type="submit" class="btn-account">一键生成所有选手账号</button>
+            </form>
+        </div>
+
+        <div class="message">
+            {% if message %}<span class="{{ msg_type }}">{{ message }}</span>{% endif %}
+        </div>
+    </div>
+
+    <script>
+        async function updateStatus() {
+            try {
+                const res = await fetch('/api/competition_status');
+                const data = await res.json();
+                const statusText = document.getElementById('status_text');
+                const remainingEl = document.getElementById('remaining');
+                const startBtn = document.getElementById('start_btn');
+                if (data.status === 'not_started') {
+                    statusText.textContent = '未开始'; statusText.style.color = '#f39c12';
+                    remainingEl.textContent = ''; startBtn.disabled = false; startBtn.textContent = '开始比赛';
+                } else if (data.status === 'running') {
+                    statusText.textContent = '进行中'; statusText.style.color = '#0dac67';
+                    const h = Math.floor(data.remaining_seconds / 3600);
+                    const m = Math.floor((data.remaining_seconds % 3600) / 60);
+                    const s = data.remaining_seconds % 60;
+                    remainingEl.textContent = `剩余时间：${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                    startBtn.disabled = true; startBtn.textContent = '比赛进行中';
+                } else if (data.status === 'buffer') {
+                    statusText.textContent = '缓冲期'; statusText.style.color = '#f39c12';
+                    remainingEl.textContent = '裁判统计成绩中...';
+                    startBtn.disabled = true; startBtn.textContent = '缓冲期';
+                } else {
+                    statusText.textContent = '已结束'; statusText.style.color = '#e74c3c';
+                    remainingEl.textContent = ''; startBtn.disabled = false; startBtn.textContent = '重新开始比赛';
+                }
+            } catch (err) { console.error(err); }
+        }
+        setInterval(updateStatus, 1000);
+        updateStatus();
+    </script>
+</body>
+</html>

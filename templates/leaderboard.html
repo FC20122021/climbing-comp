@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时排名大屏</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff; color: #1a418f; min-height: 100vh; padding: 30px 20px; position: relative;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 25px; font-size: 2.4em; letter-spacing: 1px; color: #1a418f; }
+        .status-bar {
+            text-align: center; font-size: 2.2em; margin-bottom: 25px; font-weight: bold;
+            min-height: 2.2em; color: #0dac67; background: #e8f7ef;
+            padding: 15px; border-radius: 12px;
+        }
+        table {
+            width: 100%; border-collapse: collapse; background: #ffffff;
+            border-radius: 12px; overflow: hidden; border: 2px solid #0dac67;
+            box-shadow: 0 4px 15px rgba(13,172,103,0.1);
+        }
+        th, td { padding: 16px; text-align: center; border-bottom: 1px solid #e8f7ef; font-size: 1.15em; color: #1a418f; }
+        th { background: #f3dfae; font-weight: 700; letter-spacing: 0.5px; }
+        tr:hover td { background: #f6fdf9; }
+
+        .medal-badge {
+            display: inline-block; width: 40px; height: 40px; line-height: 40px;
+            border-radius: 50%; font-weight: bold; font-size: 22px;
+            color: white; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .medal-badge.gold { background: #f1c40f; color: #1a418f; }
+        .medal-badge.silver { background: #bdc3c7; color: #1a418f; }
+        .medal-badge.bronze { background: #e67e22; }
+
+        .podium { display: flex; justify-content: center; gap: 24px; margin-top: 30px; flex-wrap: wrap; }
+        .podium-card {
+            background: #e8f7ef; padding: 28px 24px; border-radius: 16px;
+            text-align: center; min-width: 160px; border: 2px solid #0dac67;
+        }
+        .podium-card .medal-badge { margin-bottom: 12px; }
+        .podium-card .name { font-size: 1.8em; font-weight: bold; margin: 10px 0 5px; color: #1a418f; }
+        .podium-card .score { font-size: 1.3em; color: #0dac67; font-weight: 700; }
+
+        .back-btn {
+            position: absolute; top: 20px; left: 20px;
+            background: #0dac67; color: white; text-decoration: none;
+            padding: 10px 18px; border-radius: 10px; font-size: 15px; font-weight: 600;
+            display: flex; align-items: center; gap: 6px; transition: background 0.2s;
+        }
+        .back-btn:hover { background: #0a8a53; }
+    </style>
+</head>
+<body>
+    <a class="back-btn" href="/admin/control">← 返回控制台</a>
+    <div class="container">
+        <h1>🏆 攀岩比赛实时排名</h1>
+        <div class="status-bar" id="status_bar"></div>
+        <div id="podium" class="podium"></div>
+        <table>
+            <thead>
+                <tr><th>排名</th><th>编号</th><th>姓名</th><th>总积分</th><th>Top数</th><th>Zone数</th></tr>
+            </thead>
+            <tbody id="leaderboard_body">
+                <tr><td colspan="6">加载中...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+        function medal(rank) {
+            if (rank === 1) return `<span class="medal-badge gold">1</span>`;
+            if (rank === 2) return `<span class="medal-badge silver">2</span>`;
+            if (rank === 3) return `<span class="medal-badge bronze">3</span>`;
+            return rank;
+        }
+        async function updateStatus() {
+            try {
+                const res = await fetch('/api/competition_status');
+                const data = await res.json();
+                const statusBar = document.getElementById('status_bar');
+                if (data.status === 'running') statusBar.textContent = `比赛进行中 剩余时间：${formatTime(data.remaining_seconds)}`;
+                else if (data.status === 'buffer') statusBar.textContent = '⏸ 裁判统计成绩中...';
+                else if (data.status === 'ended') statusBar.textContent = '🏁 比赛已结束';
+                else statusBar.textContent = '比赛尚未开始';
+            } catch (err) { console.error(err); }
+        }
+        async function refreshLeaderboard() {
+            try {
+                const lbRes = await fetch('/api/leaderboard');
+                const leaderboard = await lbRes.json();
+                const tbody = document.getElementById('leaderboard_body');
+                tbody.innerHTML = '';
+                leaderboard.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${medal(item.rank)}</td><td>${item.number || ''}</td><td>${item.name}</td><td>${item.total_score}</td><td>${item.top_count}</td><td>${item.zone_count}</td>`;
+                    tbody.appendChild(tr);
+                });
+                const statusRes = await fetch('/api/competition_status');
+                const statusData = await statusRes.json();
+                const podium = document.getElementById('podium');
+                if (statusData.status === 'ended') {
+                    const top3 = leaderboard.slice(0, 3);
+                    podium.innerHTML = top3.map(item => `
+                        <div class="podium-card">
+                            <div>${medal(item.rank)}</div>
+                            <div class="name">${item.name}</div>
+                            <div class="score">总分：${item.total_score}</div>
+                        </div>
+                    `).join('');
+                } else { podium.innerHTML = ''; }
+            } catch (err) { console.error(err); }
+        }
+        setInterval(updateStatus, 1000);
+        updateStatus();
+        setInterval(refreshLeaderboard, 3000);
+        refreshLeaderboard();
+    </script>
+</body>
+</html>

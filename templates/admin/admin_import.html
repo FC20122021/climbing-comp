@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>导入选手编号</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px;
+        }
+        .container {
+            max-width: 600px; margin: 60px auto; background: #ffffff;
+            border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.1); padding: 36px 28px;
+        }
+        h1 { font-size: 28px; color: #1a418f; text-align: center; margin-bottom: 24px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 15px; color: #1a418f; margin-bottom: 8px; font-weight: 600; }
+        input[type="file"] {
+            width: 100%; padding: 14px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; background-color: #ffffff; font-size: 15px; color: #1a418f;
+        }
+        button {
+            width: 100%; padding: 16px; background-color: #0dac67; color: white;
+            border: none; border-radius: 12px; font-size: 18px; font-weight: 700;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        button:hover { background-color: #0a8a53; }
+        .message {
+            padding: 14px 18px; border-radius: 10px; margin-bottom: 20px;
+            font-size: 15px; text-align: center;
+            background-color: #e8f7ef; color: #0dac67;
+            border: 1px solid #0dac67; font-weight: 600;
+        }
+        .error-list {
+            margin-top: 20px; background: #fff8e1; border: 1px solid #ffe082;
+            border-radius: 10px; padding: 16px;
+        }
+        .error-list h3 { font-size: 16px; color: #f57c00; margin-bottom: 10px; }
+        .error-list ul { list-style: none; padding-left: 0; }
+        .error-list li {
+            font-size: 14px; color: #c62828; padding: 6px 0;
+            border-bottom: 1px dashed #ffe082;
+        }
+        .error-list li:last-child { border-bottom: none; }
+        .hint { margin-top: 15px; font-size: 14px; color: #1a418f; opacity: 0.7; line-height: 1.7; }
+        @media (max-width: 768px) {
+            body { margin-left: 0; padding-top: 64px; }
+            .container { margin: 30px auto; padding: 26px 20px; border-radius: 20px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    {% include '_nav.html' %}
+    <div class="container">
+        <h1>📥 导入选手编号</h1>
+        {% if message %}<div class="message">{{ message }}</div>{% endif %}
+        {% if errors %}
+        <div class="error-list">
+            <h3>跳过详情：</h3>
+            <ul>{% for err in errors %}<li>{{ err }}</li>{% endfor %}</ul>
+        </div>
+        {% endif %}
+        <form action="{{ url_for('admin_import_post') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>选择 Excel 文件（.xlsx）</label>
+                <input type="file" name="file" accept=".xlsx" required>
+            </div>
+            <button type="submit">上传并导入</button>
+        </form>
+        <p class="hint">Excel 格式：第一列编号，第二列姓名，第一行为表头。<br>系统将根据姓名匹配报名记录并更新编号。</p>
+    </div>
+</body>
+</html>

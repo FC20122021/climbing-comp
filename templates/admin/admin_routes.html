@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>线路管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px;
+        }
+        .container {
+            max-width: 700px; margin: 60px auto; background: #ffffff;
+            border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.1); padding: 36px 28px;
+        }
+        h1 { font-size: 28px; color: #1a418f; margin-bottom: 24px; text-align: center; }
+        .form-card {
+            background: #e8f7ef; border-radius: 14px; padding: 22px;
+            margin-bottom: 25px; border: 1px solid #0dac67;
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a418f; font-size: 15px; }
+        input[type="text"] {
+            width: 100%; padding: 14px 16px; border: 1.5px solid #c8e6d6;
+            border-radius: 10px; font-size: 17px; background: white; color: #1a418f;
+        }
+        input[type="text"]:focus { outline: none; border-color: #0dac67; box-shadow: 0 0 0 3px rgba(13,172,103,0.15); }
+        .btn-primary {
+            width: 100%; padding: 15px; background: #0dac67; color: white;
+            border: none; border-radius: 10px; font-size: 17px; font-weight: 700;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-primary:hover { background: #0a8a53; }
+        h2 { font-size: 20px; color: #1a418f; margin-bottom: 12px; }
+        .route-list { list-style: none; }
+        .route-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 18px; border-bottom: 1px solid #e8f7ef;
+            font-size: 17px; background: white; border-radius: 10px;
+            margin-bottom: 8px; border: 1px solid #e8f7ef;
+        }
+        .route-item .route-name { font-weight: 600; color: #1a418f; }
+        .route-item .route-id { color: #0dac67; font-size: 15px; margin-right: 10px; font-weight: 700; }
+        @media (max-width: 768px) {
+            body { margin-left: 0; padding-top: 64px; }
+            .container { margin: 30px auto; padding: 26px 20px; border-radius: 20px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    {% include '_nav.html' %}
+    <div class="container">
+        <h1>🗺️ 线路管理</h1>
+        <div class="form-card">
+            <form action="{{ url_for('admin_routes_post') }}" method="POST">
+                <div class="form-group">
+                    <label for="name">新线路名称</label>
+                    <input type="text" id="name" name="name" placeholder="例如：线路9" required>
+                </div>
+                <button type="submit" class="btn-primary">添加线路</button>
+            </form>
+        </div>
+        <h2>现有线路</h2>
+        {% if routes %}
+        <ul class="route-list">
+            {% for route in routes %}
+            <li class="route-item">
+                <span><span class="route-id">#{{ route.id }}</span><span class="route-name">{{ route.name }}</span></span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p style="text-align:center; color:#1a418f; opacity:0.6; padding:20px;">暂无线路</p>
+        {% endif %}
+    </div>
+</body>
+</html>

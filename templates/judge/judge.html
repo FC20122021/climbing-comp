@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>裁判打分</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+        .container {
+            width: 100%; max-width: 540px; background: #fff;
+            border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.12); padding: 28px 24px;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h1 { font-size: 26px; color: #1a418f; }
+        .logout {
+            color: #ffffff; background: #0dac67; text-decoration: none;
+            font-size: 15px; font-weight: 600; padding: 8px 16px;
+            border-radius: 8px; transition: background 0.2s;
+        }
+        .logout:hover { background: #0a8a53; }
+        .judge-info { text-align: center; color: #1a418f; opacity: 0.75; font-size: 15px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 15px; color: #1a418f; margin-bottom: 8px; font-weight: 600; }
+        select, input {
+            width: 100%; padding: 14px 16px; border: 1.5px solid #c8e6d6;
+            border-radius: 12px; font-size: 18px; background: #ffffff;
+            color: #1a418f; -webkit-appearance: none; appearance: none;
+        }
+        select:focus, input:focus { outline: none; border-color: #0dac67; box-shadow: 0 0 0 3px rgba(13,172,103,0.15); }
+        .athlete-name {
+            margin-top: 8px; font-weight: bold; color: #1a418f;
+            font-size: 21px; min-height: 28px; text-align: center;
+        }
+        .buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .btn {
+            flex: 1; padding: 18px 0; border: none; border-radius: 16px;
+            font-size: 21px; font-weight: bold; cursor: pointer; color: white;
+            transition: transform 0.1s, box-shadow 0.1s; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-fail { background: #e74c3c; }
+        .btn-zone { background: #f39c12; }
+        .btn-top { background: #0dac67; }
+        .btn-undo {
+            background: #e8f7ef; color: #0dac67; width: 100%; margin-top: 12px;
+            padding: 14px; border: none; border-radius: 12px; font-size: 17px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-undo:hover { background: #d0eddd; }
+        .message {
+            margin-top: 15px; text-align: center; font-weight: bold;
+            font-size: 22px; min-height: 32px; color: #1a418f;
+        }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26,65,143,0.4); z-index: 1000;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: white; border-radius: 20px; padding: 30px 24px;
+            max-width: 420px; width: 100%; text-align: center;
+            box-shadow: 0 20px 50px rgba(13,172,103,0.25);
+            animation: popIn 0.2s ease-out; border: 2px solid #0dac67;
+        }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal h2 { font-size: 24px; color: #1a418f; margin-bottom: 20px; }
+        .modal .confirm-info { background: #e8f7ef; border-radius: 12px; padding: 18px; margin-bottom: 20px; text-align: left; }
+        .modal .confirm-info .row {
+            display: flex; justify-content: space-between; padding: 10px 0;
+            font-size: 17px; border-bottom: 1px solid rgba(13,172,103,0.2); color: #1a418f;
+        }
+        .modal .confirm-info .row:last-child { border-bottom: none; }
+        .modal .confirm-info .label { opacity: 0.75; }
+        .modal .confirm-info .value { font-weight: bold; }
+        .modal .result-badge { display: inline-block; padding: 4px 12px; border-radius: 8px; color: white; font-weight: bold; }
+        .modal .result-badge.fail { background: #e74c3c; }
+        .modal .result-badge.zone { background: #f39c12; }
+        .modal .result-badge.top { background: #0dac67; }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; }
+        .modal-btn-cancel { background: #e8f7ef; color: #0dac67; }
+        .modal-btn-confirm { background: #0dac67; color: white; }
+        .modal-btn-confirm:active { background: #0a8a53; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧗 裁判打分</h1>
+            <a class="logout" href="/judge/logout">退出</a>
+        </div>
+        <div class="judge-info">裁判：{{ judge_username }}</div>
+
+        <div class="form-group">
+            <label>选择线路</label>
+            <select id="route_id">
+                {% for route in routes %}
+                <option value="{{ route.id }}">{{ route.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>选手编号</label>
+            <input type="number" id="athlete_number" placeholder="输入编号">
+            <div class="athlete-name" id="athlete_name"></div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-fail" onclick="openConfirm('fail')">失败</button>
+            <button class="btn btn-zone" onclick="openConfirm('zone')">得分点</button>
+            <button class="btn btn-top" onclick="openConfirm('top')">完攀</button>
+        </div>
+
+        <button class="btn-undo" onclick="undoLast()">撤销上一步</button>
+        <div class="message" id="message"></div>
+    </div>
+
+    <div class="modal-overlay" id="confirm_modal">
+        <div class="modal">
+            <h2>确认成绩</h2>
+            <div class="confirm-info">
+                <div class="row"><span class="label">选手编号</span><span class="value" id="confirm_number">-</span></div>
+                <div class="row"><span class="label">选手姓名</span><span class="value" id="confirm_name">-</span></div>
+                <div class="row"><span class="label">线路</span><span class="value" id="confirm_route">-</span></div>
+                <div class="row"><span class="label">成绩</span><span class="value" id="confirm_result">-</span></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeConfirm()">取消</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmSubmit()">确认提交</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingResult = null;
+        document.getElementById('athlete_number').addEventListener('change', async function() {
+            const num = this.value;
+            const nameEl = document.getElementById('athlete_name');
+            if (!num) { nameEl.textContent = ''; return; }
+            try {
+                const res = await fetch(`/api/athlete/${num}`);
+                if (res.ok) { const data = await res.json(); nameEl.textContent = '姓名：' + data.name; nameEl.style.color = '#1a418f'; }
+                else { nameEl.textContent = '选手不存在'; nameEl.style.color = '#e74c3c'; }
+            } catch (err) { nameEl.textContent = '查询失败'; nameEl.style.color = '#e74c3c'; }
+        });
+        function getResultLabel(result) {
+            if (result === 'fail') return '失败';
+            if (result === 'zone') return '得分点';
+            if (result === 'top') return '完攀';
+            return result;
+        }
+        function openConfirm(result) {
+            const athlete_number = document.getElementById('athlete_number').value;
+            const routeSelect = document.getElementById('route_id');
+            const route_name = routeSelect.options[routeSelect.selectedIndex].text;
+            const msgEl = document.getElementById('message');
+            if (!athlete_number) { msgEl.textContent = '⚠️ 请输入选手编号'; msgEl.style.color = '#f39c12'; return; }
+            const nameText = document.getElementById('athlete_name').textContent;
+            if (nameText.includes('不存在') || nameText === '') { msgEl.textContent = '⚠️ 请先确认选手编号有效'; msgEl.style.color = '#e74c3c'; return; }
+            pendingResult = result;
+            document.getElementById('confirm_number').textContent = athlete_number;
+            document.getElementById('confirm_name').textContent = nameText.replace('姓名：', '');
+            document.getElementById('confirm_route').textContent = route_name;
+            document.getElementById('confirm_result').innerHTML = `<span class="result-badge ${result}">${getResultLabel(result)}</span>`;
+            document.getElementById('confirm_modal').classList.add('show');
+        }
+        function closeConfirm() { document.getElementById('confirm_modal').classList.remove('show'); pendingResult = null; }
+        async function confirmSubmit() {
+            if (!pendingResult) return;
+            const athlete_number = document.getElementById('athlete_number').value;
+            const route_id = document.getElementById('route_id').value;
+            const result = pendingResult;
+            const msgEl = document.getElementById('message');
+            closeConfirm();
+            try {
+                const res = await fetch('/api/submit_score', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({athlete_number: parseInt(athlete_number), route_id: parseInt(route_id), result})
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    msgEl.textContent = '✅ ' + (data.message || '成绩已记录');
+                    msgEl.style.color = '#0dac67';
+                    document.getElementById('athlete_number').value = '';
+                    document.getElementById('athlete_name').textContent = '';
+                } else {
+                    msgEl.textContent = '⚠️ ' + (data.error || '提交失败');
+                    msgEl.style.color = '#e74c3c';
+                }
+                setTimeout(() => { msgEl.textContent = ''; }, 2500);
+            } catch (err) { msgEl.textContent = '⚠️ 网络错误'; msgEl.style.color = '#e74c3c'; }
+        }
+        async function undoLast() {
+            const msgEl = document.getElementById('message');
+            try {
+                const res = await fetch('/api/undo_last', {method: 'POST'});
+                const data = await res.json();
+                if (res.ok) { msgEl.textContent = '✅ ' + (data.message || '已撤销'); msgEl.style.color = '#0dac67'; }
+                else { msgEl.textContent = '⚠️ ' + (data.error || '撤销失败'); msgEl.style.color = '#f39c12'; }
+                setTimeout(() => { msgEl.textContent = ''; }, 2500);
+            } catch (err) { msgEl.textContent = '⚠️ 网络错误'; msgEl.style.color = '#e74c3c'; }
+        }
+    </script>
+</body>
+</html>
