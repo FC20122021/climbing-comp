@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Judge Scoring</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+        .container {
+            width: 100%; max-width: 540px; background: #fff;
+            border: 2px solid #0dac67; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13,172,103,0.12); padding: 28px 24px;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h1 { font-size: 26px; color: #1a418f; }
+        .logout {
+            color: #ffffff; background: #0dac67; text-decoration: none;
+            font-size: 15px; font-weight: 600; padding: 8px 16px;
+            border-radius: 8px; transition: background 0.2s;
+        }
+        .logout:hover { background: #0a8a53; }
+        .judge-info { text-align: center; color: #1a418f; opacity: 0.75; font-size: 15px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 15px; color: #1a418f; margin-bottom: 8px; font-weight: 600; }
+        select, input {
+            width: 100%; padding: 14px 16px; border: 1.5px solid #c8e6d6;
+            border-radius: 12px; font-size: 18px; background: #ffffff;
+            color: #1a418f; -webkit-appearance: none; appearance: none;
+        }
+        select:focus, input:focus { outline: none; border-color: #0dac67; box-shadow: 0 0 0 3px rgba(13,172,103,0.15); }
+        .athlete-name {
+            margin-top: 8px; font-weight: bold; color: #1a418f;
+            font-size: 21px; min-height: 28px; text-align: center;
+        }
+        .fixed-athlete {
+            background: #e8f7ef; border: 1.5px solid #0dac67;
+            border-radius: 12px; padding: 16px; text-align: center;
+        }
+        .fixed-athlete .label { font-size: 14px; color: #1a418f; opacity: 0.7; margin-bottom: 6px; }
+        .fixed-athlete .number { font-size: 26px; font-weight: bold; color: #0dac67; }
+        .fixed-athlete .name { font-size: 18px; color: #1a418f; margin-top: 6px; }
+        .buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .btn {
+            flex: 1; padding: 18px 0; border: none; border-radius: 16px;
+            font-size: 21px; font-weight: bold; cursor: pointer; color: white;
+            transition: transform 0.1s, box-shadow 0.1s; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-fail { background: #e74c3c; }
+        .btn-zone { background: #f39c12; }
+        .btn-top { background: #0dac67; }
+        .btn-undo {
+            background: #e8f7ef; color: #0dac67; width: 100%; margin-top: 12px;
+            padding: 14px; border: none; border-radius: 12px; font-size: 17px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-undo:hover { background: #d0eddd; }
+        .message {
+            margin-top: 15px; text-align: center; font-weight: bold;
+            font-size: 22px; min-height: 32px; color: #1a418f;
+        }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26,65,143,0.4); z-index: 1000;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: white; border-radius: 20px; padding: 30px 24px;
+            max-width: 420px; width: 100%; text-align: center;
+            box-shadow: 0 20px 50px rgba(13,172,103,0.25);
+            animation: popIn 0.2s ease-out; border: 2px solid #0dac67;
+        }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal h2 { font-size: 24px; color: #1a418f; margin-bottom: 20px; }
+        .modal .confirm-info { background: #e8f7ef; border-radius: 12px; padding: 18px; margin-bottom: 20px; text-align: left; }
+        .modal .confirm-info .row {
+            display: flex; justify-content: space-between; padding: 10px 0;
+            font-size: 17px; border-bottom: 1px solid rgba(13,172,103,0.2); color: #1a418f;
+        }
+        .modal .confirm-info .row:last-child { border-bottom: none; }
+        .modal .confirm-info .label { opacity: 0.75; }
+        .modal .confirm-info .value { font-weight: bold; }
+        .modal .result-badge { display: inline-block; padding: 4px 12px; border-radius: 8px; color: white; font-weight: bold; }
+        .modal .result-badge.fail { background: #e74c3c; }
+        .modal .result-badge.zone { background: #f39c12; }
+        .modal .result-badge.top { background: #0dac67; }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; }
+        .modal-btn-cancel { background: #e8f7ef; color: #0dac67; }
+        .modal-btn-confirm { background: #0dac67; color: white; }
+        .modal-btn-confirm:active { background: #0a8a53; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧗 Judge Scoring</h1>
+            <a class="logout" href="/judge/logout">Log Out</a>
+        </div>
+        <div class="judge-info">Account: {{ judge_username }}</div>
+
+        <div class="form-group">
+            <label>Select Route</label>
+            <select id="route_id">
+                {% for route in routes %}
+                <option value="{{ route.id }}">{{ route.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% set auto_number = None %}
+        {% if judge_username.startswith('judge') and judge_username[5:].isdigit() %}
+            {% set auto_number = judge_username[5:] %}
+        {% endif %}
+
+        {% if auto_number %}
+        <div class="form-group">
+            <label>Current Climber</label>
+            <div class="fixed-athlete">
+                <div class="label">Your competition number</div>
+                <div class="number">{{ auto_number }}</div>
+                <div class="name" id="athlete_name">Loading...</div>
+            </div>
+            <input type="hidden" id="athlete_number" value="{{ auto_number }}">
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label>Climber Number</label>
+            <input type="number" id="athlete_number" placeholder="Enter number">
+            <div class="athlete-name" id="athlete_name"></div>
+        </div>
+        {% endif %}
+
+        <div class="buttons">
+            <button class="btn btn-fail" onclick="openConfirm('fail')">Fail</button>
+            <button class="btn btn-zone" onclick="openConfirm('zone')">Zone</button>
+            <button class="btn btn-top" onclick="openConfirm('top')">Top</button>
+        </div>
+
+        <button class="btn-undo" onclick="undoLast()">Undo Last</button>
+        <div class="message" id="message"></div>
+    </div>
+
+    <div class="modal-overlay" id="confirm_modal">
+        <div class="modal">
+            <h2>Confirm Score</h2>
+            <div class="confirm-info">
+                <div class="row"><span class="label">Climber No.</span><span class="value" id="confirm_number">-</span></div>
+                <div class="row"><span class="label">Name</span><span class="value" id="confirm_name">-</span></div>
+                <div class="row"><span class="label">Route</span><span class="value" id="confirm_route">-</span></div>
+                <div class="row"><span class="label">Result</span><span class="value" id="confirm_result">-</span></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeConfirm()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmSubmit()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingResult = null;
+        const isAutoNumber = {{ 'true' if auto_number else 'false' }};
+
+        async function loadAthleteName() {
+            const numEl = document.getElementById('athlete_number');
+            if (!numEl) return;
+            const num = numEl.value;
+            const nameEl = document.getElementById('athlete_name');
+            if (!num) { nameEl.textContent = ''; return; }
+            try {
+                const res = await fetch(`/api/athlete/${num}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    nameEl.textContent = 'Name: ' + data.name;
+                    nameEl.style.color = '#1a418f';
+                } else {
+                    nameEl.textContent = 'Climber not found';
+                    nameEl.style.color = '#e74c3c';
+                }
+            } catch (err) {
+                nameEl.textContent = 'Lookup failed';
+                nameEl.style.color = '#e74c3c';
+            }
+        }
+
+        const numInput = document.getElementById('athlete_number');
+        if (numInput && !isAutoNumber) {
+            numInput.addEventListener('change', loadAthleteName);
+        }
+        if (isAutoNumber) { loadAthleteName(); }
+
+        function getResultLabel(result) {
+            if (result === 'fail') return 'Fail';
+            if (result === 'zone') return 'Zone';
+            if (result === 'top') return 'Top';
+            return result;
+        }
+
+        function openConfirm(result) {
+            const numEl = document.getElementById('athlete_number');
+            const athlete_number = numEl ? numEl.value : '';
+            const routeSelect = document.getElementById('route_id');
+            const route_name = routeSelect.options[routeSelect.selectedIndex].text;
+            const msgEl = document.getElementById('message');
+            const nameEl = document.getElementById('athlete_name');
+
+            if (!athlete_number) {
+                msgEl.textContent = '⚠️ Enter climber number';
+                msgEl.style.color = '#f39c12';
+                return;
+            }
+            const nameText = nameEl.textContent || '';
+            if (nameText.includes('not found') || nameText === 'Loading...' || nameText === '') {
+                msgEl.textContent = '⚠️ Please verify the climber number';
+                msgEl.style.color = '#e74c3c';
+                return;
+            }
+
+            pendingResult = result;
+            document.getElementById('confirm_number').textContent = athlete_number;
+            document.getElementById('confirm_name').textContent = nameText.replace('Name: ', '');
+            document.getElementById('confirm_route').textContent = route_name;
+            document.getElementById('confirm_result').innerHTML = `<span class="result-badge ${result}">${getResultLabel(result)}</span>`;
+            document.getElementById('confirm_modal').classList.add('show');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirm_modal').classList.remove('show');
+            pendingResult = null;
+        }
+
+        async function confirmSubmit() {
+            if (!pendingResult) return;
+            const numEl = document.getElementById('athlete_number');
+            const athlete_number = numEl ? numEl.value : '';
+            const route_id = document.getElementById('route_id').value;
+            const result = pendingResult;
+            const msgEl = document.getElementById('message');
+            closeConfirm();
+
+            try {
+                const res = await fetch('/api/submit_score', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        athlete_number: parseInt(athlete_number),
+                        route_id: parseInt(route_id),
+                        result: result
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    msgEl.textContent = '✅ ' + (data.message || 'Score recorded');
+                    msgEl.style.color = '#0dac67';
+                    if (!isAutoNumber) {
+                        numEl.value = '';
+                        document.getElementById('athlete_name').textContent = '';
+                    }
+                } else {
+                    msgEl.textContent = '⚠️ ' + (data.error || 'Submission failed');
+                    msgEl.style.color = '#e74c3c';
+                }
+                setTimeout(() => { msgEl.textContent = ''; }, 2500);
+            } catch (err) {
+                msgEl.textContent = '⚠️ Network error';
+                msgEl.style.color = '#e74c3c';
+            }
+        }
+
+        async function undoLast() {
+            const msgEl = document.getElementById('message');
+            try {
+                const res = await fetch('/api/undo_last', {method: 'POST'});
+                const data = await res.json();
+                if (res.ok) {
+                    msgEl.textContent = '✅ ' + (data.message || 'Undone');
+                    msgEl.style.color = '#0dac67';
+                } else {
+                    msgEl.textContent = '⚠️ ' + (data.error || 'Undo failed');
+                    msgEl.style.color = '#f39c12';
+                }
+                setTimeout(() => { msgEl.textContent = ''; }, 2500);
+            } catch (err) {
+                msgEl.textContent = '⚠️ Network error';
+                msgEl.style.color = '#e74c3c';
+            }
+        }
+    </script>
+</body>
+</html>
