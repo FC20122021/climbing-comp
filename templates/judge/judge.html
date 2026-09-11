@@ -37,6 +37,22 @@
             margin-top: 8px; font-weight: bold; color: #1a418f;
             font-size: 21px; min-height: 28px; text-align: center;
         }
+
+        /* 固定选手卡片 */
+        .fixed-athlete {
+            background: #e8f7ef; border: 1.5px solid #0dac67;
+            border-radius: 12px; padding: 18px; text-align: center;
+        }
+        .fixed-athlete .label {
+            font-size: 14px; color: #1a418f; opacity: 0.7; margin-bottom: 8px;
+        }
+        .fixed-athlete .number {
+            font-size: 28px; font-weight: bold; color: #0dac67;
+        }
+        .fixed-athlete .name {
+            font-size: 18px; color: #1a418f; margin-top: 8px;
+        }
+
         .buttons { display: flex; gap: 12px; margin-top: 20px; }
         .btn {
             flex: 1; padding: 18px 0; border: none; border-radius: 16px;
@@ -96,8 +112,9 @@
             <h1>🧗 裁判打分</h1>
             <a class="logout" href="/judge/logout">退出</a>
         </div>
-        <div class="judge-info">裁判：{{ judge_username }}</div>
+        <div class="judge-info">账号：{{ judge_username }}</div>
 
+        <!-- 线路选择 -->
         <div class="form-group">
             <label>选择线路</label>
             <select id="route_id">
@@ -107,11 +124,29 @@
             </select>
         </div>
 
+        <!-- 选手编号：judgeN 自动带入；其他账号手动输入 -->
+        {% set auto_number = None %}
+        {% if judge_username.startswith('judge') and judge_username[5:].isdigit() %}
+            {% set auto_number = judge_username[5:] %}
+        {% endif %}
+
+        {% if auto_number %}
+        <div class="form-group">
+            <label>当前选手</label>
+            <div class="fixed-athlete">
+                <div class="label">你的比赛编号</div>
+                <div class="number">{{ auto_number }}</div>
+                <div class="name" id="athlete_name">加载中...</div>
+            </div>
+            <input type="hidden" id="athlete_number" value="{{ auto_number }}">
+        </div>
+        {% else %}
         <div class="form-group">
             <label>选手编号</label>
             <input type="number" id="athlete_number" placeholder="输入编号">
             <div class="athlete-name" id="athlete_name"></div>
         </div>
+        {% endif %}
 
         <div class="buttons">
             <button class="btn btn-fail" onclick="openConfirm('fail')">失败</button>
@@ -123,6 +158,7 @@
         <div class="message" id="message"></div>
     </div>
 
+    <!-- 确认弹窗 -->
     <div class="modal-overlay" id="confirm_modal">
         <div class="modal">
             <h2>确认成绩</h2>
@@ -141,30 +177,64 @@
 
     <script>
         let pendingResult = null;
-        document.getElementById('athlete_number').addEventListener('change', async function() {
-            const num = this.value;
+        const isAutoNumber = {{ 'true' if auto_number else 'false' }};
+
+        async function loadAthleteName() {
+            const numEl = document.getElementById('athlete_number');
+            if (!numEl) return;
+            const num = numEl.value;
             const nameEl = document.getElementById('athlete_name');
             if (!num) { nameEl.textContent = ''; return; }
             try {
                 const res = await fetch(`/api/athlete/${num}`);
-                if (res.ok) { const data = await res.json(); nameEl.textContent = '姓名：' + data.name; nameEl.style.color = '#1a418f'; }
-                else { nameEl.textContent = '选手不存在'; nameEl.style.color = '#e74c3c'; }
-            } catch (err) { nameEl.textContent = '查询失败'; nameEl.style.color = '#e74c3c'; }
-        });
+                if (res.ok) {
+                    const data = await res.json();
+                    nameEl.textContent = '姓名：' + data.name;
+                    nameEl.style.color = '#1a418f';
+                } else {
+                    nameEl.textContent = '选手不存在';
+                    nameEl.style.color = '#e74c3c';
+                }
+            } catch (err) {
+                nameEl.textContent = '查询失败';
+                nameEl.style.color = '#e74c3c';
+            }
+        }
+
+        const numInput = document.getElementById('athlete_number');
+        if (numInput && !isAutoNumber) {
+            numInput.addEventListener('change', loadAthleteName);
+        }
+        if (isAutoNumber) { loadAthleteName(); }
+
         function getResultLabel(result) {
             if (result === 'fail') return '失败';
             if (result === 'zone') return '得分点';
             if (result === 'top') return '完攀';
             return result;
         }
+
         function openConfirm(result) {
-            const athlete_number = document.getElementById('athlete_number').value;
+            const numEl = document.getElementById('athlete_number');
+            const athlete_number = numEl ? numEl.value : '';
             const routeSelect = document.getElementById('route_id');
             const route_name = routeSelect.options[routeSelect.selectedIndex].text;
             const msgEl = document.getElementById('message');
-            if (!athlete_number) { msgEl.textContent = '⚠️ 请输入选手编号'; msgEl.style.color = '#f39c12'; return; }
-            const nameText = document.getElementById('athlete_name').textContent;
-            if (nameText.includes('不存在') || nameText === '') { msgEl.textContent = '⚠️ 请先确认选手编号有效'; msgEl.style.color = '#e74c3c'; return; }
+            const nameEl = document.getElementById('athlete_name');
+
+            if (!athlete_number) {
+                msgEl.textContent = '⚠️ 请输入选手编号';
+                msgEl.style.color = '#f39c12';
+                return;
+            }
+
+            const nameText = nameEl.textContent || '';
+            if (nameText.includes('不存在') || nameText === '加载中...' || nameText === '') {
+                msgEl.textContent = '⚠️ 请先确认选手编号有效';
+                msgEl.style.color = '#e74c3c';
+                return;
+            }
+
             pendingResult = result;
             document.getElementById('confirm_number').textContent = athlete_number;
             document.getElementById('confirm_name').textContent = nameText.replace('姓名：', '');
@@ -172,42 +242,67 @@
             document.getElementById('confirm_result').innerHTML = `<span class="result-badge ${result}">${getResultLabel(result)}</span>`;
             document.getElementById('confirm_modal').classList.add('show');
         }
-        function closeConfirm() { document.getElementById('confirm_modal').classList.remove('show'); pendingResult = null; }
+
+        function closeConfirm() {
+            document.getElementById('confirm_modal').classList.remove('show');
+            pendingResult = null;
+        }
+
         async function confirmSubmit() {
             if (!pendingResult) return;
-            const athlete_number = document.getElementById('athlete_number').value;
+            const numEl = document.getElementById('athlete_number');
+            const athlete_number = numEl ? numEl.value : '';
             const route_id = document.getElementById('route_id').value;
             const result = pendingResult;
             const msgEl = document.getElementById('message');
             closeConfirm();
+
             try {
                 const res = await fetch('/api/submit_score', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({athlete_number: parseInt(athlete_number), route_id: parseInt(route_id), result})
+                    body: JSON.stringify({
+                        athlete_number: parseInt(athlete_number),
+                        route_id: parseInt(route_id),
+                        result: result
+                    })
                 });
                 const data = await res.json();
                 if (res.ok) {
                     msgEl.textContent = '✅ ' + (data.message || '成绩已记录');
                     msgEl.style.color = '#0dac67';
-                    document.getElementById('athlete_number').value = '';
-                    document.getElementById('athlete_name').textContent = '';
+                    if (!isAutoNumber) {
+                        numEl.value = '';
+                        document.getElementById('athlete_name').textContent = '';
+                    }
                 } else {
                     msgEl.textContent = '⚠️ ' + (data.error || '提交失败');
                     msgEl.style.color = '#e74c3c';
                 }
                 setTimeout(() => { msgEl.textContent = ''; }, 2500);
-            } catch (err) { msgEl.textContent = '⚠️ 网络错误'; msgEl.style.color = '#e74c3c'; }
+            } catch (err) {
+                msgEl.textContent = '⚠️ 网络错误';
+                msgEl.style.color = '#e74c3c';
+            }
         }
+
         async function undoLast() {
             const msgEl = document.getElementById('message');
             try {
                 const res = await fetch('/api/undo_last', {method: 'POST'});
                 const data = await res.json();
-                if (res.ok) { msgEl.textContent = '✅ ' + (data.message || '已撤销'); msgEl.style.color = '#0dac67'; }
-                else { msgEl.textContent = '⚠️ ' + (data.error || '撤销失败'); msgEl.style.color = '#f39c12'; }
+                if (res.ok) {
+                    msgEl.textContent = '✅ ' + (data.message || '已撤销');
+                    msgEl.style.color = '#0dac67';
+                } else {
+                    msgEl.textContent = '⚠️ ' + (data.error || '撤销失败');
+                    msgEl.style.color = '#f39c12';
+                }
                 setTimeout(() => { msgEl.textContent = ''; }, 2500);
-            } catch (err) { msgEl.textContent = '⚠️ 网络错误'; msgEl.style.color = '#e74c3c'; }
+            } catch (err) {
+                msgEl.textContent = '⚠️ 网络错误';
+                msgEl.style.color = '#e74c3c';
+            }
         }
     </script>
 </body>
