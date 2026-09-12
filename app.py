@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 攀岩比赛系统 - 报名 + 打分 + 权限区分
-适配 Render 部署（数据库使用 /tmp 目录）
-选手用 judgeN 账号登录时，打分自动使用 N 作为选手编号
+数据持久化：优先使用 Supabase PostgreSQL（通过 DATABASE_URL 环境变量）
+本地开发：自动回退到 SQLite
 支持中英双语（首页、报名页、登录页、裁判打分页）
 """
 
@@ -18,13 +18,23 @@ from openpyxl import Workbook
 # -------------------- 应用初始化 --------------------
 app = Flask(__name__)
 
-if os.path.exists('/tmp'):
-    db_path = os.path.join('/tmp', 'climbing.db')
+# 数据库配置：优先使用环境变量中的 DATABASE_URL（Render + Supabase）
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # 兼容 postgres:// 与 postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    # Supabase 要求 SSL 连接
+    if 'sslmode' not in database_url:
+        separator = '&' if '?' in database_url else '?'
+        database_url = database_url + separator + 'sslmode=require'
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
+    # 本地开发使用 SQLite
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'climbing.db')
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 
@@ -265,21 +275,14 @@ def index():
     return render_template('public/index.html')
 
 
-# -------------------- 历史比赛（公开） --------------------
-@app.route('/competitions')
-def competitions():
-    return render_template('public/competitions.html')
-
 # -------------------- 比赛名单（公开） --------------------
 @app.route('/athletes')
 def athletes_list():
     all_athletes = Athlete.query.all()
 
-    # 有编号的：按编号升序
     with_number = [a for a in all_athletes if a.number is not None]
     with_number.sort(key=lambda x: x.number)
 
-    # 无编号的：按姓名升序，放在最后
     without_number = [a for a in all_athletes if a.number is None]
     without_number.sort(key=lambda x: x.name.lower())
 
@@ -288,6 +291,12 @@ def athletes_list():
     if session.get('lang') == 'en':
         return render_template('public/athletes_en.html', athletes=sorted_athletes)
     return render_template('public/athletes.html', athletes=sorted_athletes)
+
+
+# -------------------- 历史比赛（公开） --------------------
+@app.route('/competitions')
+def competitions():
+    return render_template('public/competitions.html')
 
 
 # -------------------- 报名（公开） --------------------
