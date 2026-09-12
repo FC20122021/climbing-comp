@@ -35,14 +35,66 @@
         .medal-badge.silver { background: #bdc3c7; color: #1a418f; }
         .medal-badge.bronze { background: #e67e22; }
 
-        .podium { display: flex; justify-content: center; gap: 24px; margin-top: 30px; flex-wrap: wrap; }
-        .podium-card {
-            background: #e8f7ef; padding: 28px 24px; border-radius: 16px;
-            text-align: center; min-width: 160px; border: 2px solid #0dac67;
+        /* 领奖台 */
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 16px;
+            margin-top: 40px;
+            min-height: 320px;
         }
-        .podium-card .medal-badge { margin-bottom: 12px; }
-        .podium-card .name { font-size: 1.8em; font-weight: bold; margin: 10px 0 5px; color: #1a418f; }
-        .podium-card .score { font-size: 1.3em; color: #0dac67; font-weight: 700; }
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .podium-item .winner-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #1a418f;
+            margin-bottom: 8px;
+            text-align: center;
+            min-height: 1.5em;
+        }
+        .podium-item .winner-score {
+            font-size: 0.95em;
+            color: #0dac67;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .platform {
+            width: 150px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .platform .rank-number {
+            font-size: 2.4em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        /* 冠军 - 中间最高 - 金色 */
+        .platform.gold {
+            height: 240px;
+            background: linear-gradient(180deg, #f5d76e 0%, #d4ac0d 100%);
+        }
+        /* 亚军 - 左边第二高 - 银色 */
+        .platform.silver {
+            height: 180px;
+            background: linear-gradient(180deg, #d5dbdb 0%, #95a5a6 100%);
+        }
+        /* 季军 - 右边第三高 - 铜色 */
+        .platform.bronze {
+            height: 130px;
+            background: linear-gradient(180deg, #eb9950 0%, #ca6f1e 100%);
+        }
 
         .back-btn {
             position: absolute; top: 20px; left: 20px;
@@ -51,6 +103,24 @@
             display: flex; align-items: center; gap: 6px; transition: background 0.2s;
         }
         .back-btn:hover { background: #0a8a53; }
+
+        @media (max-width: 768px) {
+            body { padding: 60px 12px 20px; }
+            h1 { font-size: 1.6em; margin-bottom: 16px; }
+            .status-bar { font-size: 1.4em; padding: 10px; }
+            th, td { padding: 10px 6px; font-size: 0.9em; }
+            .medal-badge { width: 30px; height: 30px; line-height: 30px; font-size: 16px; }
+
+            .podium { gap: 8px; min-height: 260px; margin-top: 20px; }
+            .platform { width: 90px; padding-top: 10px; }
+            .platform .rank-number { font-size: 1.8em; }
+            .platform.gold { height: 180px; }
+            .platform.silver { height: 135px; }
+            .platform.bronze { height: 100px; }
+            .podium-item .winner-name { font-size: 1em; }
+            .podium-item .winner-score { font-size: 0.8em; }
+            .back-btn { padding: 8px 12px; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
@@ -76,23 +146,55 @@
             const s = seconds % 60;
             return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
         }
+
         function medal(rank) {
             if (rank === 1) return `<span class="medal-badge gold">1</span>`;
             if (rank === 2) return `<span class="medal-badge silver">2</span>`;
             if (rank === 3) return `<span class="medal-badge bronze">3</span>`;
             return rank;
         }
-        async function updateStatus() {
+
+        // 本地倒计时机制
+        let serverRemaining = null;
+        let lastSyncTime = 0;
+        let currentStatus = 'not_started';
+
+        async function syncStatus() {
             try {
                 const res = await fetch('/api/competition_status');
                 const data = await res.json();
+                currentStatus = data.status;
+                serverRemaining = data.remaining_seconds;
+                lastSyncTime = Date.now();
+
                 const statusBar = document.getElementById('status_bar');
-                if (data.status === 'running') statusBar.textContent = `比赛进行中 剩余时间：${formatTime(data.remaining_seconds)}`;
-                else if (data.status === 'buffer') statusBar.textContent = '⏸ 裁判统计成绩中...';
-                else if (data.status === 'ended') statusBar.textContent = '🏁 比赛已结束';
-                else statusBar.textContent = '比赛尚未开始';
-            } catch (err) { console.error(err); }
+                if (data.status === 'running') {
+                    statusBar.textContent = `比赛进行中 剩余时间：${formatTime(serverRemaining)}`;
+                } else if (data.status === 'buffer') {
+                    statusBar.textContent = '⏸ 裁判统计成绩中...';
+                    serverRemaining = null;
+                } else if (data.status === 'ended') {
+                    statusBar.textContent = '🏁 比赛已结束';
+                    serverRemaining = null;
+                } else {
+                    statusBar.textContent = '比赛尚未开始';
+                    serverRemaining = null;
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
+
+        // 每秒本地更新倒计时
+        function tick() {
+            if (currentStatus === 'running' && serverRemaining !== null) {
+                const elapsed = Math.floor((Date.now() - lastSyncTime) / 1000);
+                const current = Math.max(0, serverRemaining - elapsed);
+                const statusBar = document.getElementById('status_bar');
+                statusBar.textContent = `比赛进行中 剩余时间：${formatTime(current)}`;
+            }
+        }
+
         async function refreshLeaderboard() {
             try {
                 const lbRes = await fetch('/api/leaderboard');
@@ -104,23 +206,54 @@
                     tr.innerHTML = `<td>${medal(item.rank)}</td><td>${item.number || ''}</td><td>${item.name}</td><td>${item.total_score}</td><td>${item.top_count}</td><td>${item.zone_count}</td>`;
                     tbody.appendChild(tr);
                 });
+
                 const statusRes = await fetch('/api/competition_status');
                 const statusData = await statusRes.json();
                 const podium = document.getElementById('podium');
                 if (statusData.status === 'ended') {
                     const top3 = leaderboard.slice(0, 3);
-                    podium.innerHTML = top3.map(item => `
-                        <div class="podium-card">
-                            <div>${medal(item.rank)}</div>
-                            <div class="name">${item.name}</div>
-                            <div class="score">总分：${item.total_score}</div>
+                    const first = top3[0] || {name: '—', total_score: 0};
+                    const second = top3[1] || {name: '—', total_score: 0};
+                    const third = top3[2] || {name: '—', total_score: 0};
+
+                    podium.innerHTML = `
+                        <div class="podium-item">
+                            <div class="winner-name">${second.name}</div>
+                            <div class="winner-score">${second.total_score} 分</div>
+                            <div class="platform silver">
+                                <div class="rank-number">2</div>
+                            </div>
                         </div>
-                    `).join('');
-                } else { podium.innerHTML = ''; }
-            } catch (err) { console.error(err); }
+                        <div class="podium-item">
+                            <div class="winner-name">${first.name}</div>
+                            <div class="winner-score">${first.total_score} 分</div>
+                            <div class="platform gold">
+                                <div class="rank-number">1</div>
+                            </div>
+                        </div>
+                        <div class="podium-item">
+                            <div class="winner-name">${third.name}</div>
+                            <div class="winner-score">${third.total_score} 分</div>
+                            <div class="platform bronze">
+                                <div class="rank-number">3</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    podium.innerHTML = '';
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
-        setInterval(updateStatus, 1000);
-        updateStatus();
+
+        // 首次加载
+        syncStatus();
+        // 每秒本地 tick 一次倒计时
+        setInterval(tick, 1000);
+        // 每 30 秒和服务器同步一次（避免长时间偏差）
+        setInterval(syncStatus, 30000);
+        // 每 3 秒刷新排名
         setInterval(refreshLeaderboard, 3000);
         refreshLeaderboard();
     </script>
