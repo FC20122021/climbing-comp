@@ -270,6 +270,25 @@ def index():
 def competitions():
     return render_template('public/competitions.html')
 
+# -------------------- 比赛名单（公开） --------------------
+@app.route('/athletes')
+def athletes_list():
+    all_athletes = Athlete.query.all()
+
+    # 有编号的：按编号升序
+    with_number = [a for a in all_athletes if a.number is not None]
+    with_number.sort(key=lambda x: x.number)
+
+    # 无编号的：按姓名升序，放在最后
+    without_number = [a for a in all_athletes if a.number is None]
+    without_number.sort(key=lambda x: x.name.lower())
+
+    sorted_athletes = with_number + without_number
+
+    if session.get('lang') == 'en':
+        return render_template('public/athletes_en.html', athletes=sorted_athletes)
+    return render_template('public/athletes.html', athletes=sorted_athletes)
+
 
 # -------------------- 报名（公开） --------------------
 @app.route('/signup', methods=['GET'])
