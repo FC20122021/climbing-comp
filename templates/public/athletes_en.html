@@ -69,7 +69,7 @@
                         <tr>
                             <th>No.</th>
                             <th>Name</th>
-                            <th>Level</th>
+                            <th>Phone</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,7 +83,7 @@
                                 {% endif %}
                             </td>
                             <td>{{ athlete.name }}</td>
-                            <td>{{ athlete.level or '—' }}</td>
+                            <td>****{{ athlete.phone[-4:] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
