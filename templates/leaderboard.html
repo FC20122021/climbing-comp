@@ -35,12 +35,15 @@
         .medal-badge.silver { background: #bdc3c7; color: #1a418f; }
         .medal-badge.bronze { background: #e67e22; }
 
-        /* 领奖台 */
+        /* 领奖台：为空时不占空间 */
         .podium {
             display: flex;
             justify-content: center;
             align-items: flex-end;
             gap: 16px;
+            margin-top: 0;
+        }
+        .podium:not(:empty) {
             margin-top: 40px;
             min-height: 320px;
         }
@@ -111,7 +114,8 @@
             th, td { padding: 10px 6px; font-size: 0.9em; }
             .medal-badge { width: 30px; height: 30px; line-height: 30px; font-size: 16px; }
 
-            .podium { gap: 8px; min-height: 260px; margin-top: 20px; }
+            .podium { gap: 8px; }
+            .podium:not(:empty) { margin-top: 20px; min-height: 260px; }
             .platform { width: 90px; padding-top: 10px; }
             .platform .rank-number { font-size: 1.8em; }
             .platform.gold { height: 180px; }
