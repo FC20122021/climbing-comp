@@ -100,10 +100,7 @@ with app.app_context():
         db.create_all()
 
         if Judge.query.count() == 0:
-            db.session.add_all([
-                Judge(username='admin', password='admin123', role='admin'),
-                Judge(username='judge1', password='judge123', role='judge')
-            ])
+            db.session.add(Judge(username='admin', password='admin123', role='admin'))
             db.session.commit()
         else:
             admin = Judge.query.filter_by(username='admin').first()
@@ -702,7 +699,7 @@ def admin_start():
 
     state.status = 'running'
     state.start_time = datetime.now()
-    state.end_time = datetime.now() + timedelta(hours=2)
+    state.end_time = datetime.now() + timedelta(minutes=1)
     state.buffer_end_time = None
     db.session.commit()
     return redirect(url_for('leaderboard_page'))
