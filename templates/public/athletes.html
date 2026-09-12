@@ -69,7 +69,7 @@
                         <tr>
                             <th>编号</th>
                             <th>姓名</th>
-                            <th>水平</th>
+                            <th>手机号</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,7 +83,7 @@
                                 {% endif %}
                             </td>
                             <td>{{ athlete.name }}</td>
-                            <td>{{ athlete.level or '—' }}</td>
+                            <td>****{{ athlete.phone[-4:] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
