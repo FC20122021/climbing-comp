@@ -2,3 +2,4 @@ flask
 flask-sqlalchemy
 openpyxl
 gunicorn
+psycopg2-binary
