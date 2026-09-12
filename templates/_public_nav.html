@@ -12,6 +12,7 @@
     <!-- 菜单项 -->
     <nav class="sidebar-nav">
         <a href="/" class="nav-link">{% if is_en %}About Us{% else %}关于我们{% endif %}</a>
+        <a href="/athletes" class="nav-link">{% if is_en %}Roster{% else %}比赛名单{% endif %}</a>
         <a href="/competitions" class="nav-link">{% if is_en %}Past Events{% else %}历史比赛{% endif %}</a>
         <a href="/signup" class="nav-link">{% if is_en %}Register{% else %}报名{% endif %}</a>
     </nav>
@@ -35,11 +36,14 @@
     <!-- 手机端 Logo -->
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Allez Climbing Gym" class="logo-img-mobile">
 
-    <!-- 手机端菜单项（横向滚动） -->
-    <div class="mobile-menu">
-        <a href="/" class="nav-link-mobile">{% if is_en %}About{% else %}关于我们{% endif %}</a>
-        <a href="/competitions" class="nav-link-mobile">{% if is_en %}Events{% else %}历史比赛{% endif %}</a>
-        <a href="/signup" class="nav-link-mobile">{% if is_en %}Register{% else %}报名{% endif %}</a>
+    <!-- 手机端菜单项（横向滚动 + 右侧渐变提示） -->
+    <div class="mobile-menu-wrapper">
+        <div class="mobile-menu">
+            <a href="/" class="nav-link-mobile">{% if is_en %}About{% else %}关于我们{% endif %}</a>
+            <a href="/athletes" class="nav-link-mobile">{% if is_en %}Roster{% else %}名单{% endif %}</a>
+            <a href="/competitions" class="nav-link-mobile">{% if is_en %}Events{% else %}历史{% endif %}</a>
+            <a href="/signup" class="nav-link-mobile">{% if is_en %}Register{% else %}报名{% endif %}</a>
+        </div>
     </div>
 
     <!-- 语言切换（手机端） -->
@@ -183,18 +187,43 @@
         z-index: 100;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
+
+    /* 菜单外层容器：负责渐变提示 */
+    .mobile-menu-wrapper {
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+    /* 右侧渐变遮罩，暗示可滑动 */
+    .mobile-menu-wrapper::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 28px;
+        background: linear-gradient(to right, rgba(243,223,174,0) 0%, #f3dfae 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
     .mobile-menu {
         display: flex;
         align-items: center;
         gap: 4px;
         overflow-x: auto;
-        flex: 1;
+        width: 100%;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
+        padding-right: 30px; /* 给渐变留空间 */
     }
     .mobile-menu::-webkit-scrollbar {
         display: none;
     }
+
     .navbar-mobile .nav-link-mobile {
         color: #1a418f;
         text-decoration: none;
@@ -210,6 +239,7 @@
         background: rgba(255, 255, 255, 0.65);
         color: #0dac67;
     }
+
     .lang-btn-mobile {
         color: #1a418f;
         text-decoration: none;
@@ -220,10 +250,12 @@
         background: rgba(255, 255, 255, 0.6);
         flex-shrink: 0;
         transition: background 0.2s;
+        z-index: 2;
     }
     .lang-btn-mobile:hover {
         background: rgba(255, 255, 255, 0.9);
     }
+
     .btn-login-mobile {
         color: #ffffff;
         text-decoration: none;
@@ -234,6 +266,7 @@
         background: #0dac67;
         flex-shrink: 0;
         transition: background 0.2s;
+        z-index: 2;
     }
     .btn-login-mobile:hover {
         background: #0a8a53;
