@@ -699,7 +699,7 @@ def admin_start():
 
     state.status = 'running'
     state.start_time = datetime.now()
-    state.end_time = datetime.now() + timedelta(minutes=1)
+    state.end_time = datetime.now() + timedelta(hours=2)
     state.buffer_end_time = None
     db.session.commit()
     return redirect(url_for('leaderboard_page'))
