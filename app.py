@@ -559,6 +559,15 @@ def leaderboard_page():
     return render_template('leaderboard.html')
 
 
+# -------------------- 抽奖转盘（管理员） --------------------
+@app.route('/admin/lottery')
+@admin_required
+def admin_lottery():
+    # 只取有编号的选手，按编号升序
+    athletes = Athlete.query.filter(Athlete.number.isnot(None)).order_by(Athlete.number).all()
+    return render_template('admin/admin_lottery.html', athletes=athletes)
+
+
 # -------------------- 管理后台 --------------------
 @app.route('/admin/routes', methods=['GET'])
 @admin_required
@@ -684,6 +693,7 @@ def admin_control():
     message = request.args.get('message', '')
     msg_type = request.args.get('type', 'success')
     return render_template('admin/admin_control.html', message=message, msg_type=msg_type)
+
 
 
 @app.route('/admin/start', methods=['POST'])
