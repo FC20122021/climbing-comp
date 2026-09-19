@@ -9,51 +9,75 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: #ffffff; min-height: 100vh; color: #1a418f; margin-left: 240px;
-            padding: 30px 20px;
+            padding: 40px 20px;
         }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { text-align: center; font-size: 28px; color: #1a418f; margin-bottom: 10px; }
-        .subtitle { text-align: center; color: #1a418f; opacity: 0.65; font-size: 15px; margin-bottom: 30px; }
+        .container { max-width: 720px; margin: 0 auto; }
+        h1 { text-align: center; font-size: 32px; color: #1a418f; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #1a418f; opacity: 0.65; font-size: 15px; margin-bottom: 40px; }
 
-        .wheel-wrapper {
+        /* 老虎机显示窗 */
+        .slot-machine {
+            background: linear-gradient(135deg, #1a418f 0%, #0d2b63 100%);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(26,65,143,0.35), inset 0 0 0 4px #0dac67;
+            margin-bottom: 40px;
             position: relative;
-            width: 600px;
-            height: 600px;
-            margin: 0 auto 30px;
-            max-width: 90vw;
-            max-height: 90vw;
+            overflow: hidden;
         }
-        #wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 0 40px rgba(13,172,103,0.25), 0 0 0 8px #ffffff, 0 0 0 12px #0dac67;
-            display: block;
-        }
-        .pointer {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 22px solid transparent;
-            border-right: 22px solid transparent;
-            border-top: 46px solid #e74c3c;
-            z-index: 10;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-        }
-        .pointer::after {
+        .slot-machine::before,
+        .slot-machine::after {
             content: '';
             position: absolute;
-            top: -58px;
-            left: -14px;
-            width: 28px;
-            height: 28px;
-            background: #e74c3c;
-            border-radius: 50%;
-            border: 4px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            left: 0;
+            right: 0;
+            height: 50px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .slot-machine::before {
+            top: 0;
+            background: linear-gradient(to bottom, rgba(26,65,143,0.95), rgba(26,65,143,0));
+        }
+        .slot-machine::after {
+            bottom: 0;
+            background: linear-gradient(to top, rgba(26,65,143,0.95), rgba(26,65,143,0));
+        }
+
+        .slot-window {
+            position: relative;
+            height: 260px;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .slot-number {
+            font-size: 140px;
+            font-weight: 900;
+            color: #1a418f;
+            letter-spacing: 4px;
+            line-height: 1;
+            transition: none;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 4px 0 rgba(26,65,143,0.1);
+        }
+        .slot-number.rolling {
+            color: #0dac67;
+        }
+
+        /* 中奖后的闪光效果 */
+        .slot-machine.winner {
+            animation: winnerPulse 0.6s ease-out;
+        }
+        @keyframes winnerPulse {
+            0% { box-shadow: 0 20px 60px rgba(26,65,143,0.35), inset 0 0 0 4px #0dac67; }
+            50% { box-shadow: 0 20px 80px rgba(241,196,15,0.6), inset 0 0 0 4px #f1c40f; }
+            100% { box-shadow: 0 20px 60px rgba(26,65,143,0.35), inset 0 0 0 4px #0dac67; }
         }
 
         .controls {
@@ -67,13 +91,14 @@
             background: #0dac67;
             color: white;
             border: none;
-            padding: 18px 50px;
-            border-radius: 14px;
-            font-size: 20px;
+            padding: 20px 60px;
+            border-radius: 16px;
+            font-size: 22px;
             font-weight: 700;
             cursor: pointer;
             transition: transform 0.1s, background 0.2s;
-            box-shadow: 0 6px 16px rgba(13,172,103,0.3);
+            box-shadow: 0 8px 20px rgba(13,172,103,0.35);
+            letter-spacing: 2px;
         }
         .btn-spin:hover { background: #0a8a53; }
         .btn-spin:active { transform: scale(0.96); }
@@ -83,45 +108,45 @@
             background: #ffffff;
             color: #1a418f;
             border: 2px solid #1a418f;
-            padding: 16px 36px;
-            border-radius: 14px;
-            font-size: 17px;
+            padding: 18px 36px;
+            border-radius: 16px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s;
         }
         .btn-reset:hover { background: #f0f4f8; }
 
+        /* 结果展示 */
         .result-box {
             text-align: center;
-            padding: 30px;
+            padding: 36px 24px;
             background: linear-gradient(135deg, #ece0f8 0%, #d3b8ea 100%);
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(155,110,200,0.2);
-            min-height: 140px;
+            min-height: 160px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
-        .result-box .label { font-size: 16px; color: #7b3fa0; font-weight: 600; margin-bottom: 10px; }
-        .result-box .winner {
-            font-size: 48px;
+        .result-box .placeholder {
+            font-size: 20px;
+            color: #7b3fa0;
+            opacity: 0.6;
+        }
+        .result-box .label {
+            font-size: 18px;
+            color: #7b3fa0;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .result-box .winner-name {
+            font-size: 44px;
             font-weight: 900;
             color: #1a418f;
             letter-spacing: 2px;
             line-height: 1.2;
-        }
-        .result-box .winner-name {
-            font-size: 22px;
-            color: #7b3fa0;
-            margin-top: 8px;
-            font-weight: 600;
-        }
-        .result-box .placeholder {
-            font-size: 18px;
-            color: #7b3fa0;
-            opacity: 0.6;
         }
 
         .empty-state {
@@ -133,37 +158,40 @@
         }
 
         @media (max-width: 768px) {
-            body { margin-left: 0; padding-top: 80px; }
-            h1 { font-size: 22px; }
-            .btn-spin { padding: 16px 36px; font-size: 18px; }
-            .btn-reset { padding: 14px 28px; font-size: 15px; }
-            .result-box .winner { font-size: 36px; }
-            .result-box .winner-name { font-size: 18px; }
+            body { margin-left: 0; padding-top: 80px; padding-left: 16px; padding-right: 16px; }
+            h1 { font-size: 26px; }
+            .slot-window { height: 200px; }
+            .slot-number { font-size: 100px; }
+            .btn-spin { padding: 18px 44px; font-size: 20px; }
+            .btn-reset { padding: 16px 28px; font-size: 16px; }
+            .result-box .winner-name { font-size: 34px; }
         }
     </style>
 </head>
 <body>
     {% include '_nav.html' %}
     <div class="container">
-        <h1>🎁 抽奖转盘</h1>
-        <p class="subtitle">按选手编号抽取幸运儿 · 共 {{ athletes|length }} 位选手</p>
+        <h1>🎁 抽奖</h1>
+        <p class="subtitle">共 {{ athletes|length }} 位选手参与 · 点击开始滚动号码</p>
 
         {% if athletes %}
-        <div class="wheel-wrapper">
-            <div class="pointer"></div>
-            <canvas id="wheel" width="1200" height="1200"></canvas>
+        <div class="slot-machine" id="slotMachine">
+            <div class="slot-window">
+                <div class="slot-number" id="slotNumber">?</div>
+            </div>
         </div>
 
         <div class="controls">
-            <button class="btn-spin" id="spinBtn" onclick="spin()">开始抽奖</button>
+            <button class="btn-spin" id="spinBtn" onclick="spin()">开 始 抽 奖</button>
             <button class="btn-reset" onclick="resetResult()">重置</button>
         </div>
 
         <div class="result-box" id="resultBox">
             <div class="placeholder" id="resultPlaceholder">点击「开始抽奖」</div>
-            <div class="label" id="resultLabel" style="display:none;">🎉 恭喜抽中</div>
-            <div class="winner" id="resultNumber" style="display:none;"></div>
-            <div class="winner-name" id="resultName" style="display:none;"></div>
+            <div id="resultContent" style="display:none;">
+                <div class="label">🎉 恭喜抽中</div>
+                <div class="winner-name" id="winnerName"></div>
+            </div>
         </div>
         {% else %}
         <div class="empty-state">
@@ -180,152 +208,79 @@
             {% endfor %}
         ];
 
-        const canvas = document.getElementById('wheel');
-        const ctx = canvas.getContext('2d');
-        const size = canvas.width;
-        const cx = size / 2;
-        const cy = size / 2;
-        const radius = size / 2 - 10;
-
-        // 配色循环
-        const palette = [
-            '#0dac67', '#1a418f', '#f39c12', '#e74c3c',
-            '#9b59b6', '#16a085', '#d35400', '#2c3e50',
-            '#27ae60', '#2980b9'
-        ];
-
-        let currentRotation = 0;
         let isSpinning = false;
-
-        function drawWheel(rotation) {
-            const n = athletes.length;
-            const arc = 2 * Math.PI / n;
-
-            ctx.clearRect(0, 0, size, size);
-
-            for (let i = 0; i < n; i++) {
-                const angle = i * arc + rotation;
-
-                // 画扇区
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.arc(cx, cy, radius, angle, angle + arc);
-                ctx.closePath();
-                ctx.fillStyle = palette[i % palette.length];
-                ctx.fill();
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                // 画文字（编号）
-                ctx.save();
-                ctx.translate(cx, cy);
-                ctx.rotate(angle + arc / 2);
-                ctx.textAlign = 'right';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#ffffff';
-                const fontSize = Math.max(20, Math.min(56, 800 / n));
-                ctx.font = `bold ${fontSize}px -apple-system, sans-serif`;
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 4;
-                ctx.fillText(athletes[i].number, radius - 30, 0);
-                ctx.restore();
-            }
-
-            // 中心圆点
-            ctx.beginPath();
-            ctx.arc(cx, cy, 50, 0, 2 * Math.PI);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-            ctx.strokeStyle = '#0dac67';
-            ctx.lineWidth = 6;
-            ctx.stroke();
-
-            // 中心文字
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#1a418f';
-            ctx.font = `bold ${Math.min(36, size / 30)}px -apple-system, sans-serif`;
-            ctx.fillText('ALE', 0, 0);
-            ctx.restore();
-        }
-
-        // 缓动函数（easeOutCubic）
-        function easeOutCubic(t) {
-            return 1 - Math.pow(1 - t, 3);
-        }
+        let rollTimer = null;
 
         function spin() {
             if (isSpinning || athletes.length === 0) return;
             isSpinning = true;
             document.getElementById('spinBtn').disabled = true;
             document.getElementById('resultPlaceholder').style.display = 'none';
-            document.getElementById('resultLabel').style.display = 'none';
-            document.getElementById('resultNumber').style.display = 'none';
-            document.getElementById('resultName').style.display = 'none';
+            document.getElementById('resultContent').style.display = 'none';
+            document.getElementById('slotMachine').classList.remove('winner');
 
-            const n = athletes.length;
-            const arc = 2 * Math.PI / n;
+            const slotEl = document.getElementById('slotNumber');
+            slotEl.classList.add('rolling');
 
             // 随机选一个中奖者
-            const winnerIndex = Math.floor(Math.random() * n);
+            const winnerIndex = Math.floor(Math.random() * athletes.length);
+            const winner = athletes[winnerIndex];
 
-            // 计算目标旋转角度
-            // 扇区 i 的中心角（从 0 开始，Canvas 的 0 度在 3 点方向）
-            // 扇区 i 中心角 = i*arc + arc/2
-            // 指针指向 12 点方向（-PI/2）
-            // 需要最终 rotation 使扇区中心对准指针：
-            // rotation + i*arc + arc/2 = -PI/2 + 2*PI*k
-            // 所以 rotation = -PI/2 - i*arc - arc/2 + 2*PI*k
-            const turns = 6 + Math.random() * 3; // 6-9 圈
-            const baseRotation = -Math.PI / 2 - winnerIndex * arc - arc / 2;
-            const targetRotation = currentRotation + turns * 2 * Math.PI + (baseRotation - currentRotation % (2 * Math.PI));
-
-            const duration = 5000; // 5 秒
+            // 总时长约 4 秒，先快后慢
+            const totalDuration = 4000;
             const startTime = performance.now();
-            const startRotation = currentRotation;
 
-            function animate(now) {
+            // 滚动间隔从 40ms 逐渐增加到 500ms
+            function getInterval(progress) {
+                // progress 0 -> 1
+                // 40ms -> 500ms
+                return 40 + progress * 460;
+            }
+
+            let lastUpdate = startTime;
+
+            function roll(now) {
                 const elapsed = now - startTime;
-                const t = Math.min(1, elapsed / duration);
-                const eased = easeOutCubic(t);
-                const rot = startRotation + (targetRotation - startRotation) * eased;
-                drawWheel(rot);
+                const progress = Math.min(1, elapsed / totalDuration);
 
-                if (t < 1) {
-                    requestAnimationFrame(animate);
+                // 到了更新时间就换一个随机编号
+                if (now - lastUpdate >= getInterval(progress)) {
+                    lastUpdate = now;
+                    // 滚动期间显示随机编号
+                    const randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
+                    slotEl.textContent = randomAthlete.number;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(roll);
                 } else {
-                    currentRotation = targetRotation % (2 * Math.PI);
-                    drawWheel(currentRotation);
+                    // 最终停在 winnder
+                    slotEl.textContent = winner.number;
+                    slotEl.classList.remove('rolling');
 
-                    // 显示结果
-                    const winner = athletes[winnerIndex];
-                    document.getElementById('resultLabel').style.display = 'block';
-                    document.getElementById('resultNumber').textContent = '编号 ' + winner.number;
-                    document.getElementById('resultNumber').style.display = 'block';
-                    document.getElementById('resultName').textContent = winner.name;
-                    document.getElementById('resultName').style.display = 'block';
+                    // 闪光效果
+                    document.getElementById('slotMachine').classList.add('winner');
 
-                    isSpinning = false;
-                    document.getElementById('spinBtn').disabled = false;
+                    // 显示中奖者姓名
+                    setTimeout(() => {
+                        document.getElementById('winnerName').textContent = winner.name;
+                        document.getElementById('resultContent').style.display = 'block';
+
+                        isSpinning = false;
+                        document.getElementById('spinBtn').disabled = false;
+                    }, 400);
                 }
             }
 
-            requestAnimationFrame(animate);
+            requestAnimationFrame(roll);
         }
 
         function resetResult() {
+            if (isSpinning) return;
+            document.getElementById('slotNumber').textContent = '?';
             document.getElementById('resultPlaceholder').style.display = 'block';
-            document.getElementById('resultLabel').style.display = 'none';
-            document.getElementById('resultNumber').style.display = 'none';
-            document.getElementById('resultName').style.display = 'none';
-        }
-
-        // 初始绘制
-        if (athletes.length > 0) {
-            drawWheel(0);
+            document.getElementById('resultContent').style.display = 'none';
+            document.getElementById('slotMachine').classList.remove('winner');
         }
     </script>
 </body>
